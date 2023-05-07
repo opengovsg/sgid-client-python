@@ -18,6 +18,8 @@ load_dotenv()
 
 fetch_static.fetch_static_files()
 
+# In-memory store for user session data
+# In a real application, this would be a database.
 session_data = {}
 SESSION_COOKIE_NAME = "exampleAppSession"
 
@@ -41,6 +43,9 @@ def get_auth_url():
             "icecream": ice_cream_selection,
         }
     )
+    # We pass the user's ice cream preference as the state,
+    # so after they log in, we can display it together with the
+    # other user info.
     auth_url_and_nonce = sgid_client.authorization_url(state=state)
     session_data[session_id] = {
         "state": state,
@@ -58,6 +63,7 @@ def callback():
     session_id = request.cookies.get(SESSION_COOKIE_NAME)
 
     session = session_data.get(session_id, None)
+    # Validate that the state matches what we passed to sgID for this session
     if session is None or session["state"] != state:
         return redirect("/error")
 
@@ -78,8 +84,11 @@ def userinfo():
     if session is None or access_token is None:
         abort(401)
     userinfo = sgid_client.userinfo(access_token)
+
+    # Add ice cream flavour to userinfo
     ice_cream_selection = parse_qs(session["state"])["icecream"][0]
     userinfo["data"]["iceCream"] = ice_cream_selection
+
     return userinfo
 
 
