@@ -12,6 +12,7 @@ from sgid_client import SgidClient
 from dotenv import load_dotenv
 from uuid import uuid4
 from urllib.parse import urlencode, parse_qs
+import webbrowser
 
 load_dotenv()
 
@@ -96,3 +97,6 @@ def serve(path):
         return send_from_directory(app.static_folder, path)
     else:
         return send_from_directory(app.static_folder, "index.html")
+
+
+webbrowser.open("http://localhost:5000")
