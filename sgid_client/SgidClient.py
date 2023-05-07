@@ -1,8 +1,10 @@
 import secrets
 from typing import TypedDict
-import urllib
-from urllib.parse import urlparse, urlencode
-from collections import namedtuple
+from urllib.parse import urlparse, urlencode, unquote
+import requests
+import json
+from base64 import b64decode
+from jwcrypto import jwk, jwe
 
 
 class AuthorizationUrlReturn(TypedDict):
@@ -57,16 +59,87 @@ class SgidClient:
         }
         if nonce is not None:
             params["nonce"] = nonce
-        return (
+        auth_url = (
             self.hostname
             + "/v"
             + str(self.api_version)
             + "/oauth/authorize?"
             + urlencode(params)
         )
+        return {
+            "url": auth_url,
+            "nonce": nonce,
+        }
 
-    def callback(self, code: str, nonce: str = None) -> CallbackReturn:
-        pass
+    def callback(
+        self, code: str, nonce: str | None = None, redirect_uri: str | None = None
+    ) -> CallbackReturn:
+        url = self.hostname + "/v" + str(self.api_version) + "/oauth/token"
+        data = {
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "redirect_uri": self.redirect_uri if redirect_uri is None else redirect_uri,
+            "code": code,
+            "grant_type": "authorization_code",
+        }
+        res = requests.post(url, data)
+        res_body = res.json()
+        if res.status_code != 200:
+            error_message = (
+                "sgID responded with an error at the token endpoint.\n"
+                + "Response status: "
+                + res.status_code
+                + "\nResponse body: "
+                + json.dumps(res_body, indent=2)
+            )
+            raise Exception(error_message)
+        id_token: str = res_body["id_token"]
+        id_token_components = id_token.split(".")
+        header = json.loads(unquote(b64decode(id_token_components[0])))
+        payload = json.loads(unquote(b64decode(id_token_components[1])))
+        signature = id_token_components[2]
+        return {"sub": payload["sub"], "access_token": res_body["access_token"]}
 
     def userinfo(self, access_token: str) -> UserInfoReturn:
-        pass
+        url = self.hostname + "/v" + str(self.api_version) + "/oauth/userinfo"
+        headers = {
+            "Authorization": "Bearer " + access_token,
+        }
+        res = requests.get(url, headers=headers)
+        res_body = res.json()
+        if res.status_code != 200:
+            error_message = (
+                "sgID responded with an error at the token endpoint.\n"
+                + "Response status: "
+                + res.status_code
+                + "\nResponse body: "
+                + json.dumps(res_body, indent=2)
+            )
+            raise Exception(error_message)
+        decrypted_data = self.decrypt_data(
+            encrypted_key=res_body["key"], encrypted_data=res_body["data"]
+        )
+        return {"data": decrypted_data, "sub": res_body["sub"]}
+
+    def decrypt_data(self, encrypted_key: str, encrypted_data: dict):
+        # Load private_key
+        private_key = jwk.JWK.from_pem(self.private_key.encode("utf-8"))
+        jwe_key = jwe.JWE()
+
+        # Decrypt encrypted_key to get block_key
+        jwe_key.deserialize(encrypted_key, key=private_key)
+        block_key_json = jwe_key.payload
+
+        # Load block_key
+        block_key = jwk.JWK.from_json(block_key_json.decode("utf-8").replace("'", '"'))
+        jwe_data = jwe.JWE()
+
+        # Initialise dict
+        data_dict = {}
+
+        for field in encrypted_data:
+            # Decrypt encrypted_data[field] to get actual_data
+            jwe_data.deserialize(encrypted_data[field], key=block_key)
+            data_dict[field] = jwe_data.payload.decode("utf-8")
+
+        return data_dict

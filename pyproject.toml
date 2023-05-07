@@ -10,6 +10,8 @@ repository = "https://github.com/opengovsg/sgid-client-python"
 
 [tool.poetry.dependencies]
 python = "^3.11"
+requests = "^2.30.0"
+jwcrypto = "^1.4.2"
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.3.1"
