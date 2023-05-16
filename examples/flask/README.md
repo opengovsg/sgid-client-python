@@ -6,9 +6,20 @@ The example application code is in `app.py`. You can copy this code to bootstrap
 
 ### Prerequisites
 
-Register a new client at the [sgID developer portal](https://developer.id.gov.sg). Feel free to register a test client; there is no limit to the number of clients you can create.
+**Register a new sgID client**
 
-### Steps to run locally
+1. Go to the [sgID developer portal](https://developer.id.gov.sg) and log in using sgID. Click "Register new client".
+2. Enter a test name and description (there is no limit to the number of clients you can create).
+3. Under "Scopes", add "NAME".
+4. Under "Callback URLs", add the following:
+
+```
+http://localhost:2000/api/callback
+```
+
+5. Click "Register" to save the client and download the credentials.
+
+### Running the app
 
 1. Clone this repo.
 
@@ -16,7 +27,7 @@ Register a new client at the [sgID developer portal](https://developer.id.gov.sg
 git clone https://github.com/opengovsg/sgid-client-python.git
 ```
 
-2. Go to this folder and copy the contents of `example.env` into a new file called `.env`.
+2. Go to this folder (`examples/flask`) and copy the contents of `example.env` into a new file called `.env`.
 
 ```
 cd sgid-client-python/examples/flask

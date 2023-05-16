@@ -28,7 +28,7 @@ sgid_client = SgidClient.SgidClient(
     client_id=os.getenv("SGID_CLIENT_ID"),
     client_secret=os.getenv("SGID_CLIENT_SECRET"),
     private_key=os.getenv("SGID_PRIVATE_KEY"),
-    redirect_uri="http://localhost:5000/api/callback",
+    redirect_uri="http://localhost:2000/api/callback",
 )
 
 
@@ -108,4 +108,4 @@ def serve(path):
         return send_from_directory(app.static_folder, "index.html")
 
 
-webbrowser.open("http://localhost:5000")
+webbrowser.open("http://localhost:2000")
