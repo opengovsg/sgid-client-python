@@ -1,3 +1,4 @@
+import hashlib
 import json
 from .constants import MOCK_CONSTANTS
 from typing import List
@@ -90,3 +91,10 @@ def generate_user_info():
         encrypted.add_recipient(encryption_key)
         result[k] = encrypted.serialize()
     return result
+
+
+def sha256_b64url(payload: str) -> str:
+    payload_bytearray = bytearray(payload, encoding="utf-8")
+    payload_hash = hashlib.sha256(payload_bytearray).digest()
+    with_padding = urlsafe_b64encode(payload_hash).decode("utf-8")
+    return with_padding.replace("=", "")
