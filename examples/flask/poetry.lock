@@ -480,7 +480,7 @@ requests = "^2.30.0"
 type = "git"
 url = "https://github.com/opengovsg/sgid-client-python.git"
 reference = "feat/init-build"
-resolved_reference = "55d740590a7aa65709d017f2c87eb2d9ea8d889e"
+resolved_reference = "8e1aa5b0f83af7282eeb9c96fc4c7038c1839ebe"
 
 [[package]]
 name = "urllib3"
