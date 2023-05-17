@@ -115,7 +115,7 @@ class SgidClient:
         res_body = res.json()
         if res_body["sub"] != sub:
             raise Exception(Errors["USERINFO_SUB_MISMATCH"])
-        decrypted_data = decrypt_data.decrypt_data(
+        decrypted_data = decrypt_data(
             encrypted_key=res_body["key"],
             encrypted_data=res_body["data"],
             private_key=self.private_key,
