@@ -98,7 +98,7 @@ class SgidClient:
         validation.validate_access_token(access_token=access_token)
         return {"sub": sub, "access_token": access_token}
 
-    def userinfo(self, access_token: str) -> UserInfoReturn:
+    def userinfo(self, sub: str, access_token: str) -> UserInfoReturn:
         url = f"{self.hostname}/v{str(self.api_version)}/oauth/userinfo"
         headers = {
             "Authorization": f"Bearer {access_token}",
@@ -112,6 +112,8 @@ class SgidClient:
             )
             raise Exception(error_message)
         res_body = res.json()
+        if res_body["sub"] != sub:
+            raise Exception(Errors["USERINFO_SUB_MISMATCH"])
         decrypted_data = decrypt_data.decrypt_data(
             encrypted_key=res_body["key"],
             encrypted_data=res_body["data"],
