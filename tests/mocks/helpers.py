@@ -4,7 +4,7 @@ from typing import List
 from datetime import datetime
 import math
 import responses
-from jwcrypto import jwt, jwk
+from jwcrypto import jwt, jwk, jwe
 from Crypto.PublicKey import RSA
 from base64 import urlsafe_b64encode
 from sgid_client.SgidClient import SgidClient
@@ -64,3 +64,29 @@ def get_jwks_response(
     json=MOCK_CONSTANTS["server"]["public_jwks"],
 ):
     return responses.Response(method="GET", url=url, json=json)
+
+
+def generate_encrypted_block_key():
+    encryption_key = jwk.JWK.from_pem(
+        MOCK_CONSTANTS["client"]["public_key"].encode("utf-8")
+    )
+    payload = json.dumps(MOCK_CONSTANTS["data"]["block_key"])
+    encrypted = jwe.JWE(
+        plaintext=payload,
+        protected=json.dumps({"alg": "RSA-OAEP-256", "enc": "A256GCM"}),
+    )
+    encrypted.add_recipient(key=encryption_key)
+    return encrypted.serialize()
+
+
+def generate_user_info():
+    result = {}
+    encryption_key = jwk.JWK.from_json(json.dumps(MOCK_CONSTANTS["data"]["block_key"]))
+    to_encrypt: dict[str, str] = MOCK_CONSTANTS["data"]["userinfo"]
+    for k, v in to_encrypt.items():
+        encrypted = jwe.JWE(
+            plaintext=v, protected=json.dumps({"alg": "A128GCMKW", "enc": "A128GCM"})
+        )
+        encrypted.add_recipient(encryption_key)
+        result[k] = encrypted.serialize()
+    return result
