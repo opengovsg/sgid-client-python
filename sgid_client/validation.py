@@ -17,7 +17,7 @@ def validate_access_token(access_token: str):
 
 def validate_id_token(
     id_token: str,
-    hostname: str,
+    issuer: str,
     client_id: str,
     nonce: str | None,
     verifier: IdTokenVerifier.IdTokenVerifier,
@@ -32,7 +32,7 @@ def validate_id_token(
         raise Exception(Errors["ID_TOKEN_HEADER_PAYLOAD_MALFORMED"])
     validate_id_token_header(id_token_header=header)
     validate_id_token_payload(
-        id_token_payload=payload, hostname=hostname, client_id=client_id, nonce=nonce
+        id_token_payload=payload, issuer=issuer, client_id=client_id, nonce=nonce
     )
     verifier.verify_jwt(id_token)
     return payload["sub"]
@@ -52,7 +52,7 @@ def validate_id_token_header(id_token_header: dict) -> None:
 
 def validate_id_token_payload(
     id_token_payload: dict,
-    hostname: str,
+    issuer: str,
     client_id: str,
     nonce: str | None = None,
 ) -> None:
@@ -71,11 +71,11 @@ def validate_id_token_payload(
             )
         )
 
-    if id_token_payload["iss"] != hostname:
+    if id_token_payload["iss"] != issuer:
         raise Exception(
             get_expected_vs_received_error_message(
                 message=Errors["ID_TOKEN_ISS_MISMATCH"],
-                expected=hostname,
+                expected=issuer,
                 received=id_token_payload["iss"],
             )
         )

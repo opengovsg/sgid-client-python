@@ -7,6 +7,8 @@ from .IdTokenVerifier import IdTokenVerifier
 from .decrypt_data import decrypt_data
 from .error import Errors, get_network_error_message
 
+API_VERSION = 2
+
 
 class AuthorizationUrlReturn(TypedDict):
     url: str
@@ -37,11 +39,9 @@ class SgidClient:
         self.client_secret = client_secret
         self.private_key = private_key
         self.redirect_uri = redirect_uri
-        self.hostname = urlparse(hostname).geturl()
+        self.issuer = f"{urlparse(hostname).geturl()}/v{API_VERSION}"
         self.api_version = api_version
-        self.verifier = IdTokenVerifier(
-            jwks_uri=f"{self.hostname}/.well-known/jwks.json"
-        )
+        self.verifier = IdTokenVerifier(jwks_uri=f"{self.issuer}/.well-known/jwks.json")
 
     def authorization_url(
         self,
@@ -61,7 +61,7 @@ class SgidClient:
         }
         if nonce is not None:
             params["nonce"] = nonce
-        auth_url = f"{self.hostname}/v{str(self.api_version)}/oauth/authorize?{urlencode(params)}"
+        auth_url = f"{self.issuer}/oauth/authorize?{urlencode(params)}"
         return {
             "url": auth_url,
             "nonce": nonce,
@@ -70,7 +70,7 @@ class SgidClient:
     def callback(
         self, code: str, nonce: str | None = None, redirect_uri: str | None = None
     ) -> CallbackReturn:
-        url = f"{self.hostname}/v{str(self.api_version)}/oauth/token"
+        url = f"{self.issuer}/oauth/token"
         data = {
             "client_id": self.client_id,
             "client_secret": self.client_secret,
@@ -91,7 +91,7 @@ class SgidClient:
         access_token: str = res_body["access_token"]
         sub = validate_id_token(
             id_token=id_token,
-            hostname=self.hostname,
+            issuer=self.issuer,
             client_id=self.client_id,
             nonce=nonce,
             verifier=self.verifier,
@@ -100,7 +100,7 @@ class SgidClient:
         return {"sub": sub, "access_token": access_token}
 
     def userinfo(self, sub: str, access_token: str) -> UserInfoReturn:
-        url = f"{self.hostname}/v{str(self.api_version)}/oauth/userinfo"
+        url = f"{self.issuer}/oauth/userinfo"
         headers = {
             "Authorization": f"Bearer {access_token}",
         }
