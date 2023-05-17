@@ -5,7 +5,7 @@ import requests
 from .validation import validate_access_token, validate_id_token
 from .IdTokenVerifier import IdTokenVerifier
 from .decrypt_data import decrypt_data
-from .error import Errors, get_network_error_message
+from .error import Errors, get_network_error_message, get_www_authenticate_error_message
 
 API_VERSION = 2
 
@@ -114,10 +114,8 @@ class SgidClient:
         }
         res = requests.get(url, headers=headers)
         if res.status_code != 200:
-            error_message = get_network_error_message(
-                message=Errors["USERINFO_ENDPOINT_FAILED"],
-                status=res.status_code,
-                body=res.text,
+            error_message = get_www_authenticate_error_message(
+                message=Errors["USERINFO_ENDPOINT_FAILED"], res=res
             )
             raise Exception(error_message)
         res_body = res.json()

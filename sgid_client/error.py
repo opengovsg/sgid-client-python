@@ -1,6 +1,8 @@
 from typing import TypedDict
 from datetime import datetime
 
+from requests import Response
+
 
 class SgidClientError(TypedDict):
     MISSING_REDIRECT_URI: str
@@ -64,3 +66,15 @@ def get_expected_vs_received_error_message(message: str, expected, received) -> 
 def get_expiry_error_message(message: str, expired_at: float) -> str:
     curr_time = datetime.now()
     return f"{message}. Current timestamp is {curr_time.strftime('%Y/%m/%d, %H:%M:%S')}, expiry was at {datetime.fromtimestamp(expired_at).strftime('%Y/%m/%d, %H:%M:%S')}"
+
+
+def get_www_authenticate_error_message(message: str, res: Response) -> str:
+    www_authenticate_header = res.headers.get("www-authenticate", None)
+    if www_authenticate_header is None:
+        return get_network_error_message(
+            message=message, status=res.status_code, body=res.text
+        )
+
+    if www_authenticate_header.startswith("error="):
+        return f"{message}\nResponse status: {res.status_code}\nError message: {www_authenticate_header[len('error='):]}"
+    return f"{message}\nResponse status: {res.status_code}\nError message: {www_authenticate_header}"
