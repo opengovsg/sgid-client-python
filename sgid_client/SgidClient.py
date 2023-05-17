@@ -2,9 +2,10 @@ import secrets
 from typing import TypedDict
 from urllib.parse import urlparse, urlencode
 import requests
-import validation, IdTokenVerifier, decrypt_data, error
-
-Errors = error.Errors
+from .validation import validate_access_token, validate_id_token
+from .IdTokenVerifier import IdTokenVerifier
+from .decrypt_data import decrypt_data
+from .error import Errors, get_network_error_message
 
 
 class AuthorizationUrlReturn(TypedDict):
@@ -79,7 +80,7 @@ class SgidClient:
         }
         res = requests.post(url, data)
         if res.status_code != 200:
-            error_message = error.get_network_error_message(
+            error_message = get_network_error_message(
                 message=Errors["TOKEN_ENDPOINT_FAILED"],
                 status=res.status_code,
                 body=res.text,
@@ -88,14 +89,14 @@ class SgidClient:
         res_body = res.json()
         id_token: str = res_body["id_token"]
         access_token: str = res_body["access_token"]
-        sub = validation.validate_id_token(
+        sub = validate_id_token(
             id_token=id_token,
             hostname=self.hostname,
             client_id=self.client_id,
             nonce=nonce,
             verifier=self.verifier,
         )
-        validation.validate_access_token(access_token=access_token)
+        validate_access_token(access_token=access_token)
         return {"sub": sub, "access_token": access_token}
 
     def userinfo(self, sub: str, access_token: str) -> UserInfoReturn:
@@ -105,7 +106,7 @@ class SgidClient:
         }
         res = requests.get(url, headers=headers)
         if res.status_code != 200:
-            error_message = error.get_network_error_message(
+            error_message = get_network_error_message(
                 message=Errors["USERINFO_ENDPOINT_FAILED"],
                 status=res.status_code,
                 body=res.text,

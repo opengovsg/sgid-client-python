@@ -1,7 +1,5 @@
 from jwcrypto import jwk, jwe
-import error
-
-Errors = error.Errors
+from .error import Errors
 
 
 def decrypt_data(encrypted_key: str, encrypted_data: dict, private_key: str):

@@ -1,8 +1,6 @@
 import requests
 from jwcrypto import jwk, jwt as jwt_lib
-import error
-
-Errors = error.Errors
+from .error import Errors, get_network_error_message
 
 
 class IdTokenVerifier:
@@ -13,7 +11,7 @@ class IdTokenVerifier:
     def _fetch_jwks_from_uri(self):
         res = requests.get(self.jwks_uri)
         if res.status_code != 200:
-            error_message = error.get_network_error_message(
+            error_message = get_network_error_message(
                 message=Errors["JWKS_ENDPOINT_FAILED"],
                 status=res.status_code,
                 body=res.text,
