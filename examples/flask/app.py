@@ -67,10 +67,9 @@ def callback():
     if session is None or session["state"] != state:
         return redirect("/error")
 
-    access_token = sgid_client.callback(code=auth_code, nonce=session["nonce"])[
-        "access_token"
-    ]
-    session["access_token"] = access_token
+    sub_and_access_token = sgid_client.callback(code=auth_code, nonce=session["nonce"])
+    session["access_token"] = sub_and_access_token["access_token"]
+    session["sub"] = sub_and_access_token["sub"]
     session_data[session_id] = session
 
     return redirect("/logged-in")
@@ -83,7 +82,7 @@ def userinfo():
     access_token = None if session is None else session["access_token"]
     if session is None or access_token is None:
         abort(401)
-    userinfo = sgid_client.userinfo(access_token)
+    userinfo = sgid_client.userinfo(sub=session["sub"], access_token=access_token)
 
     # Add ice cream flavour to userinfo
     ice_cream_selection = parse_qs(session["state"])["icecream"][0]
