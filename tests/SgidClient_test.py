@@ -1,6 +1,5 @@
 import json
 import re
-from typing import List
 import pytest
 from sgid_client.SgidClient import SgidClient
 from urllib.parse import urlparse, parse_qs
@@ -8,32 +7,16 @@ import responses
 from datetime import datetime
 import math
 from .mocks.constants import MOCK_CONSTANTS
-from .mocks.helpers import create_id_token, make_base64url_json
+from .mocks.helpers import (
+    create_id_token,
+    make_base64url_json,
+    get_client,
+    get_jwks_response,
+)
 
 DEFAULT_SCOPE = "openid myinfo.name"
 DEFAULT_SGID_CODE_CHALLENGE_METHOD = "S256"
 DEFAULT_RESPONSE_TYPE = "code"
-
-
-def get_client(delete_args: List[str] = [], **kwargs):
-    args = {
-        "client_id": MOCK_CONSTANTS["client"]["client_id"],
-        "client_secret": MOCK_CONSTANTS["client"]["client_secret"],
-        "private_key": MOCK_CONSTANTS["client"]["private_key"],
-        "redirect_uri": MOCK_CONSTANTS["client"]["redirect_uri"],
-        "hostname": MOCK_CONSTANTS["server"]["hostname"],
-    }
-    for delete_arg in delete_args:
-        del args[delete_arg]
-    args.update(kwargs)
-    return SgidClient(**args)
-
-
-def get_jwks_response(
-    url=f"{MOCK_CONSTANTS['server']['hostname']}/v2/.well-known/jwks.json",
-    json=MOCK_CONSTANTS["server"]["public_jwks"],
-):
-    return responses.Response(method="GET", url=url, json=json)
 
 
 class TestConstructor:

@@ -1,10 +1,27 @@
 import json
 from .constants import MOCK_CONSTANTS
+from typing import List
 from datetime import datetime
 import math
+import responses
 from jwcrypto import jwt, jwk
 from Crypto.PublicKey import RSA
 from base64 import urlsafe_b64encode
+from sgid_client.SgidClient import SgidClient
+
+
+def get_client(delete_args: List[str] = [], **kwargs):
+    args = {
+        "client_id": MOCK_CONSTANTS["client"]["client_id"],
+        "client_secret": MOCK_CONSTANTS["client"]["client_secret"],
+        "private_key": MOCK_CONSTANTS["client"]["private_key"],
+        "redirect_uri": MOCK_CONSTANTS["client"]["redirect_uri"],
+        "hostname": MOCK_CONSTANTS["server"]["hostname"],
+    }
+    for delete_arg in delete_args:
+        del args[delete_arg]
+    args.update(kwargs)
+    return SgidClient(**args)
 
 
 def create_id_token(
@@ -40,3 +57,10 @@ def make_base64url_json(content: dict) -> str:
     return urlsafe_b64encode(bytearray(json.dumps(content), encoding="utf-8")).decode(
         "utf-8"
     )
+
+
+def get_jwks_response(
+    url=f"{MOCK_CONSTANTS['server']['hostname']}/v2/.well-known/jwks.json",
+    json=MOCK_CONSTANTS["server"]["public_jwks"],
+):
+    return responses.Response(method="GET", url=url, json=json)
