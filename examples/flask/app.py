@@ -24,7 +24,7 @@ session_data = {}
 SESSION_COOKIE_NAME = "exampleAppSession"
 
 app = Flask(__name__)
-sgid_client = SgidClient.SgidClient(
+sgid_client = SgidClient(
     client_id=os.getenv("SGID_CLIENT_ID"),
     client_secret=os.getenv("SGID_CLIENT_SECRET"),
     private_key=os.getenv("SGID_PRIVATE_KEY"),
