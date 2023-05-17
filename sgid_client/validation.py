@@ -3,7 +3,7 @@ from sgid_client import IdTokenVerifier
 import json
 from base64 import b64decode
 from urllib.parse import unquote
-from sgid_client import error
+import error
 
 Errors = error.Errors
 

@@ -2,7 +2,7 @@ import secrets
 from typing import TypedDict
 from urllib.parse import urlparse, urlencode
 import requests
-from sgid_client import validation, IdTokenVerifier, decrypt_data, error
+import validation, IdTokenVerifier, decrypt_data, error
 
 Errors = error.Errors
 

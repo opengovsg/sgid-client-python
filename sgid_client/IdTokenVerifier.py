@@ -1,6 +1,6 @@
 import requests
 from jwcrypto import jwk, jwt as jwt_lib
-from sgid_client import error
+import error
 
 Errors = error.Errors
 

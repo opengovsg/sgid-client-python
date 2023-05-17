@@ -1,5 +1,5 @@
 from jwcrypto import jwk, jwe
-from sgid_client import error
+import error
 
 Errors = error.Errors
 
