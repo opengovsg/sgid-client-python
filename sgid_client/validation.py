@@ -130,7 +130,7 @@ def validate_id_token_payload(
     if type(id_token_payload["sub"]) is not str or id_token_payload["sub"] == "":
         raise Exception(
             get_expected_vs_received_error_message(
-                message=Errors["ID_TOKEN_NONCE_MISMATCH"],
+                message=Errors["ID_TOKEN_SUB_INVALID"],
                 expected="a non-empty string",
                 received=id_token_payload["sub"],
             )
