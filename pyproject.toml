@@ -20,6 +20,9 @@ pre-commit = "^3.3.1"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.3.1"
+responses = "^0.23.1"
+jwcrypto = "^1.4.2"
+pycryptodome = "^3.17"
 
 [build-system]
 requires = ["poetry-core"]

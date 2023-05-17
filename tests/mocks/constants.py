@@ -8,9 +8,11 @@ mock_client_keys_file = open(os.path.join(mock_dir, "mockClientKeys.json"))
 mock_private_key_pkcs1 = open(os.path.join(mock_dir, "mockPrivateKeyPkcs1.pem"))
 mock_private_key_pkcs8 = open(os.path.join(mock_dir, "mockPrivateKeyPkcs8.pem"))
 mock_jwks_file = open(os.path.join(mock_dir, "mockPublicJwks.json"))
+mock_alternate_jwks_file = open(os.path.join(mock_dir, "mockPublicJwksAlternate.json"))
 
 mock_client_keys = json.load(mock_client_keys_file)
 mock_jwks = json.load(mock_jwks_file)
+mock_jwks_alternate = json.load(mock_alternate_jwks_file)
 
 
 hostname = "https://id.sgid.com"
@@ -27,6 +29,8 @@ MOCK_CONSTANTS: MockConstants = {
         # private_key and public_jwks are a matching pair
         "private_key": mock_private_key_pkcs1.read(),
         "public_jwks": mock_jwks,
+        # public jwks which does not correspond to any private key
+        "public_jwks_alternate": mock_jwks_alternate,
         "hostname": hostname,
         "auth_endpoint": f"{hostname}/v2/oauth/authorize",
         "token_endpoint": f"{hostname}/v2/oauth/token",
@@ -62,3 +66,4 @@ mock_client_keys_file.close()
 mock_private_key_pkcs1.close()
 mock_private_key_pkcs8.close()
 mock_jwks_file.close()
+mock_alternate_jwks_file.close()
