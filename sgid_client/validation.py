@@ -26,8 +26,10 @@ def validate_id_token(
     if len(id_token_components) != 3:
         raise Exception(Errors["ID_TOKEN_MALFORMED"])
     try:
-        header = json.loads(unquote(b64decode(id_token_components[0])))
-        payload = json.loads(unquote(b64decode(id_token_components[1])))
+        # Avoid padding errors by appending the max possible padding.
+        # b64decode will ignore any extra padding.
+        header = json.loads(unquote(b64decode(id_token_components[0] + "==")))
+        payload = json.loads(unquote(b64decode(id_token_components[1] + "==")))
     except:
         raise Exception(Errors["ID_TOKEN_HEADER_PAYLOAD_MALFORMED"])
     validate_id_token_header(id_token_header=header)
