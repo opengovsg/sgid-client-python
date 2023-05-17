@@ -146,3 +146,16 @@ userinfo = sgid_client.userinfo(sub=session["sub"], access_token=access_token)
 ## Supported Runtime and Environment
 
 Python >=3.11
+
+## For contributors
+
+### Running tests
+
+To run the tests locally,
+
+1. [Install Poetry](https://python-poetry.org/docs/#installation).
+2. Run the following:
+
+```bash
+poetry run pytest
+```
