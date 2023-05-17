@@ -34,14 +34,12 @@ class SgidClient:
         private_key: str,
         redirect_uri: str | None,
         hostname: str = "https://api.id.gov.sg",
-        api_version: int = 1,
     ):
         self.client_id = client_id
         self.client_secret = client_secret
         self.private_key = convert_to_pkcs8(private_key)
         self.redirect_uri = redirect_uri
         self.issuer = f"{urlparse(hostname).geturl()}/v{API_VERSION}"
-        self.api_version = api_version
         self.verifier = IdTokenVerifier(jwks_uri=f"{self.issuer}/.well-known/jwks.json")
 
     def authorization_url(
