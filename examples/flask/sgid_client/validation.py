@@ -3,13 +3,14 @@ from sgid_client import IdTokenVerifier
 import json
 from base64 import b64decode
 from urllib.parse import unquote
+from sgid_client import error
+
+Errors = error.Errors
 
 
 def validate_access_token(access_token: str):
     if type(access_token) is not str or access_token == "":
-        raise Exception(
-            "sgID token endpoint did not return a valid access token. Expected a non-empty string."
-        )
+        raise Exception(Errors["ACCESS_TOKEN_INVALID"])
 
 
 def validate_id_token(
@@ -21,16 +22,12 @@ def validate_id_token(
 ) -> str:
     id_token_components = id_token.split(".")
     if len(id_token_components) != 3:
-        raise Exception(
-            "sgID server returned a malformed ID token which did not contain the expected components (header, payload, signature)"
-        )
+        raise Exception(Errors["ID_TOKEN_MALFORMED"])
     try:
         header = json.loads(unquote(b64decode(id_token_components[0])))
         payload = json.loads(unquote(b64decode(id_token_components[1])))
     except:
-        raise Exception("ID token header or payload was malformed")
-    print(header)
-    print(payload)
+        raise Exception(Errors["ID_TOKEN_HEADER_PAYLOAD_MALFORMED"])
     validate_id_token_header(id_token_header=header)
     validate_id_token_payload(
         id_token_payload=payload, hostname=hostname, client_id=client_id, nonce=nonce
@@ -43,7 +40,11 @@ def validate_id_token_header(id_token_header: dict) -> None:
     received_alg = id_token_header.get("alg", None)
     if received_alg != "RS256":
         raise Exception(
-            f"Unexpected signing algorithm used for ID token; expected 'RS256', got '{received_alg}'"
+            error.get_expected_vs_received_error_message(
+                message=Errors["ID_TOKEN_WRONG_SIGNING_ALG"],
+                expected="RS256",
+                received=received_alg,
+            )
         )
 
 
@@ -55,48 +56,78 @@ def validate_id_token_payload(
 ) -> None:
     # Check that all required keys are present
     required_keys = ["iss", "sub", "aud", "exp", "iat"]
-    missing_keys = []
+    present_keys = []
     for required_key in required_keys:
-        if required_key not in id_token_payload:
-            missing_keys.append(required_key)
-    if len(missing_keys) > 0:
+        if required_key in id_token_payload:
+            present_keys.append(required_key)
+    if len(present_keys) != len(required_keys):
         raise Exception(
-            f"ID token payload did not contain the following mandatory keys: {','.join(missing_keys)}"
+            error.get_expected_vs_received_error_message(
+                message=Errors["ID_TOKEN_MISSING_KEYS"],
+                expected=",".join(required_keys),
+                received=",".join(present_keys),
+            )
         )
 
     if id_token_payload["iss"] != hostname:
         raise Exception(
-            f"ID token 'iss' did not match expected value. Expected '{hostname}', got '{id_token_payload['iss']}'"
+            error.get_expected_vs_received_error_message(
+                message=Errors["ID_TOKEN_ISS_MISMATCH"],
+                expected=hostname,
+                received=id_token_payload["iss"],
+            )
         )
 
     if type(id_token_payload["iat"]) is not int:
         raise Exception(
-            f"ID token 'iat' is invalid. Expected a valid number, got '{id_token_payload['iat']}'"
+            error.get_expected_vs_received_error_message(
+                message=Errors["ID_TOKEN_IAT_INVALID"],
+                expected="a valid number",
+                received=id_token_payload["iat"],
+            )
         )
 
     if type(id_token_payload["exp"]) is not int:
         raise Exception(
-            f"ID token 'exp' is invalid. Expected a valid number, got '{id_token_payload['exp']}'"
+            error.get_expected_vs_received_error_message(
+                message=Errors["ID_TOKEN_EXP_INVALID"],
+                expected="a valid number",
+                received=id_token_payload["exp"],
+            )
         )
 
     curr_time = datetime.now()
     if id_token_payload["exp"] < curr_time.timestamp():
         raise Exception(
-            f"ID token is expired. Current timestamp is {curr_time.strftime('%Y/%m/%d, %H:%M:%S')}, ID token expired at {datetime.fromtimestamp(id_token_payload['exp']).strftime('%Y/%m/%d, %H:%M:%S')}"
+            error.get_expiry_error_message(
+                message=Errors["ID_TOKEN_EXPIRED"], expired_at=id_token_payload["exp"]
+            )
         )
 
     if id_token_payload["aud"] != client_id:
         raise Exception(
-            f"ID token 'aud' did not match client ID. Expected '{client_id}', got '{id_token_payload['aud']}'"
+            error.get_expected_vs_received_error_message(
+                message=Errors["ID_TOKEN_AUD_MISMATCH"],
+                expected=client_id,
+                received=id_token_payload["aud"],
+            )
         )
 
     nonce_received = id_token_payload.get("nonce", None)
     if nonce is not None and nonce_received != nonce:
         raise Exception(
-            f"ID token 'nonce' did not match the nonce passed to the callback function. Expected '{nonce}', got '{nonce_received}'"
+            error.get_expected_vs_received_error_message(
+                message=Errors["ID_TOKEN_NONCE_MISMATCH"],
+                expected=nonce,
+                received=nonce_received,
+            )
         )
 
     if type(id_token_payload["sub"]) is not str or id_token_payload["sub"] == "":
         raise Exception(
-            f"ID token 'sub' is invalid. Expected a non-empty string, got '{id_token_payload['sub']}'"
+            error.get_expected_vs_received_error_message(
+                message=Errors["ID_TOKEN_NONCE_MISMATCH"],
+                expected="a non-empty string",
+                received=id_token_payload["sub"],
+            )
         )

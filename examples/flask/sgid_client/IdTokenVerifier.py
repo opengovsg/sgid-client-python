@@ -1,6 +1,8 @@
-from typing import TypedDict
 import requests
 from jwcrypto import jwk, jwt as jwt_lib
+from sgid_client import error
+
+Errors = error.Errors
 
 
 class IdTokenVerifier:
@@ -11,7 +13,11 @@ class IdTokenVerifier:
     def _fetch_jwks_from_uri(self):
         res = requests.get(self.jwks_uri)
         if res.status_code != 200:
-            error_message = f"sgID responded with an error at the jwks endpoint.\nResponse status: {res.status_code}\nResponse body: {res.text}"
+            error_message = error.get_network_error_message(
+                message=Errors["JWKS_ENDPOINT_FAILED"],
+                status=res.status_code,
+                body=res.text,
+            )
             raise Exception(error_message)
         return jwk.JWKSet.from_json(res.text)
 
@@ -26,4 +32,4 @@ class IdTokenVerifier:
             try:
                 jwt_lib.JWT(key=self.jwks_cache, jwt=jwt)
             except:
-                raise Exception("ID token signature is invalid")
+                raise Exception(Errors["ID_TOKEN_SIGNATURE_INVALID"])

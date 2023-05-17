@@ -2,7 +2,9 @@ import secrets
 from typing import TypedDict
 from urllib.parse import urlparse, urlencode
 import requests
-from sgid_client import validation, IdTokenVerifier, decrypt_data
+from sgid_client import validation, IdTokenVerifier, decrypt_data, error
+
+Errors = error.Errors
 
 
 class AuthorizationUrlReturn(TypedDict):
@@ -48,9 +50,7 @@ class SgidClient:
         nonce: str | None = secrets.token_urlsafe(32),
     ) -> AuthorizationUrlReturn:
         if redirect_uri is None and self.redirect_uri is None:
-            raise Exception(
-                "No redirect URI registered with this client. You must either specify a valid redirect URI in the SgidClient constructor, or pass it to the authorizationUrl and callback functions."
-            )
+            raise Exception(Errors["MISSING_REDIRECT_URI"])
         params = {
             "client_id": self.client_id,
             "scope": " ".join(scope) if isinstance(scope, list) else scope,
@@ -79,7 +79,11 @@ class SgidClient:
         }
         res = requests.post(url, data)
         if res.status_code != 200:
-            error_message = f"sgID responded with an error at the token endpoint.\nResponse status: {res.status_code}\nResponse body: {res.text}"
+            error_message = error.get_network_error_message(
+                message=Errors["TOKEN_ENDPOINT_FAILED"],
+                status=res.status_code,
+                body=res.text,
+            )
             raise Exception(error_message)
         res_body = res.json()
         id_token: str = res_body["id_token"]
@@ -101,7 +105,11 @@ class SgidClient:
         }
         res = requests.get(url, headers=headers)
         if res.status_code != 200:
-            error_message = f"sgID responded with an error at the userinfo endpoint.\nResponse status: {res.status_code}\nResponse body: {res.text}"
+            error_message = error.get_network_error_message(
+                message=Errors["USERINFO_ENDPOINT_FAILED"],
+                status=res.status_code,
+                body=res.text,
+            )
             raise Exception(error_message)
         res_body = res.json()
         decrypted_data = decrypt_data.decrypt_data(

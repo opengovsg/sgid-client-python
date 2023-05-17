@@ -1,0 +1,56 @@
+from typing import TypedDict
+from datetime import datetime
+
+
+class SgidClientError(TypedDict):
+    MISSING_REDIRECT_URI: str
+    TOKEN_ENDPOINT_FAILED: str
+    ID_TOKEN_MALFORMED: str
+    ID_TOKEN_HEADER_PAYLOAD_MALFORMED: str
+    ID_TOKEN_WRONG_SIGNING_ALG: str
+    ID_TOKEN_MISSING_KEYS: str
+    ID_TOKEN_ISS_MISMATCH: str
+    ID_TOKEN_IAT_INVALID: str
+    ID_TOKEN_EXP_INVALID: str
+    ID_TOKEN_EXPIRED: str
+    ID_TOKEN_AUD_MISMATCH: str
+    ID_TOKEN_NONCE_MISMATCH: str
+    ID_TOKEN_SUB_INVALID: str
+    ID_TOKEN_SIGNATURE_INVALID: str
+    ACCESS_TOKEN_INVALID: str
+    USERINFO_ENDPOINT_FAILED: str
+    JWKS_ENDPOINT_FAILED: str
+
+
+Errors: SgidClientError = {
+    "MISSING_REDIRECT_URI": "No redirect URI registered with this client. You must either specify a valid redirect URI in the SgidClient constructor, or pass it to the authorization_url and callback functions.",
+    "TOKEN_ENDPOINT_FAILED": "sgID responded with an error at the token endpoint",
+    "ID_TOKEN_MALFORMED": "sgID server returned a malformed ID token which did not contain the expected components (header, payload, signature)",
+    "ID_TOKEN_HEADER_PAYLOAD_MALFORMED": "ID token header or payload was malformed",
+    "ID_TOKEN_WRONG_SIGNING_ALG": "Unexpected signing algorithm used for ID token",
+    "ID_TOKEN_MISSING_KEYS": "ID token payload did not contain the required keys",
+    "ID_TOKEN_ISS_MISMATCH": "ID token 'iss' did not match expected value",
+    "ID_TOKEN_IAT_INVALID": "ID token 'iat' is invalid",
+    "ID_TOKEN_EXP_INVALID": "ID token 'exp' is invalid",
+    "ID_TOKEN_EXPIRED": "ID token is expired",
+    "ID_TOKEN_AUD_MISMATCH": "ID token 'aud' did not match client ID",
+    "ID_TOKEN_NONCE_MISMATCH": "ID token 'nonce' did not match the nonce passed to the callback function",
+    "ID_TOKEN_SUB_INVALID": "ID token 'sub' is invalid",
+    "ID_TOKEN_SIGNATURE_INVALID": "ID token signature is invalid",
+    "ACCESS_TOKEN_INVALID": "sgID token endpoint did not return a valid access token. Expected a non-empty string.",
+    "USERINFO_ENDPOINT_FAILED": "sgID responded with an error at the userinfo endpoint",
+    "JWKS_ENDPOINT_FAILED": "sgID responded with an error at the jwks endpoint",
+}
+
+
+def get_network_error_message(message: str, status: int, body: str) -> str:
+    return f"{message}\nResponse status: {status}\nResponse body: {body}"
+
+
+def get_expected_vs_received_error_message(message: str, expected, received) -> str:
+    return f"{message}. Expected {expected}, received {received}."
+
+
+def get_expiry_error_message(message: str, expired_at: float) -> str:
+    curr_time = datetime.now()
+    return f"{message}. Current timestamp is {curr_time.strftime('%Y/%m/%d, %H:%M:%S')}, expiry was at {datetime.fromtimestamp(expired_at).strftime('%Y/%m/%d, %H:%M:%S')}"
