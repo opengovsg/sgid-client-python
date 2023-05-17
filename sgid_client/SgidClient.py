@@ -39,7 +39,7 @@ class SgidClient:
         self.redirect_uri = redirect_uri
         self.hostname = urlparse(hostname).geturl()
         self.api_version = api_version
-        self.verifier = IdTokenVerifier.IdTokenVerifier(
+        self.verifier = IdTokenVerifier(
             jwks_uri=f"{self.hostname}/.well-known/jwks.json"
         )
 
