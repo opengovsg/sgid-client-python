@@ -1,1 +1,1 @@
-from SgidClient import SgidClient
+from .SgidClient import SgidClient
