@@ -6,6 +6,7 @@ from .validation import validate_access_token, validate_id_token
 from .IdTokenVerifier import IdTokenVerifier
 from .decrypt_data import decrypt_data
 from .error import Errors, get_network_error_message, get_www_authenticate_error_message
+from .util import convert_to_pkcs8
 
 API_VERSION = 2
 
@@ -37,7 +38,7 @@ class SgidClient:
     ):
         self.client_id = client_id
         self.client_secret = client_secret
-        self.private_key = private_key
+        self.private_key = convert_to_pkcs8(private_key)
         self.redirect_uri = redirect_uri
         self.issuer = f"{urlparse(hostname).geturl()}/v{API_VERSION}"
         self.api_version = api_version
