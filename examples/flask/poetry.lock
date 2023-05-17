@@ -463,6 +463,26 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
+name = "sgid-client"
+version = "0.1.0"
+description = "The official Python SDK for sgID"
+category = "main"
+optional = false
+python-versions = "^3.11"
+files = []
+develop = false
+
+[package.dependencies]
+jwcrypto = "^1.4.2"
+requests = "^2.30.0"
+
+[package.source]
+type = "git"
+url = "https://github.com/opengovsg/sgid-client-python.git"
+reference = "feat/init-build"
+resolved_reference = "55d740590a7aa65709d017f2c87eb2d9ea8d889e"
+
+[[package]]
 name = "urllib3"
 version = "2.0.2"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -586,4 +606,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "fb9f07da9050ee3da93b09475d89f998ec593e5eb83e8446bdf81cbbcd2bde26"
+content-hash = "fb0c95430692a84c02ff5517921442d749e02566162d3d0629eb773161d69566"
