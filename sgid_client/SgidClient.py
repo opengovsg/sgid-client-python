@@ -46,6 +46,7 @@ class SgidClient:
     def authorization_url(
         self,
         state: str,
+        code_challenge: str,
         redirect_uri: str | None = None,
         scope: str | list[str] = "openid myinfo.name",
         nonce: str | None = secrets.token_urlsafe(32),
@@ -58,6 +59,8 @@ class SgidClient:
             "redirect_uri": self.redirect_uri if redirect_uri is None else redirect_uri,
             "response_type": "code",
             "state": state,
+            "code_challenge": code_challenge,
+            "code_challenge_method": "S256",
         }
         if nonce is not None:
             params["nonce"] = nonce
@@ -68,7 +71,11 @@ class SgidClient:
         }
 
     def callback(
-        self, code: str, nonce: str | None = None, redirect_uri: str | None = None
+        self,
+        code: str,
+        code_verifier: str,
+        nonce: str | None = None,
+        redirect_uri: str | None = None,
     ) -> CallbackReturn:
         url = f"{self.issuer}/oauth/token"
         data = {
@@ -77,6 +84,7 @@ class SgidClient:
             "redirect_uri": self.redirect_uri if redirect_uri is None else redirect_uri,
             "code": code,
             "grant_type": "authorization_code",
+            "code_verifier": code_verifier,
         }
         res = requests.post(url, data)
         if res.status_code != 200:

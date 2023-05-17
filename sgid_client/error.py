@@ -23,6 +23,8 @@ class SgidClientError(TypedDict):
     USERINFO_SUB_MISMATCH: str
     USERINFO_BLOCK_KEY_DECRYPT_FAILED: str
     USERINFO_DATA_DECRYPT_FAILED: str
+    CODE_VERIFIER_LENGTH_ERROR: str
+    PKCE_PAIR_LENGTH_ERROR: str
 
 
 Errors: SgidClientError = {
@@ -46,6 +48,8 @@ Errors: SgidClientError = {
     "USERINFO_SUB_MISMATCH": "Sub returned by sgID did not match the sub passed to the userinfo method. Check that you passed the correct sub to the userinfo method.",
     "USERINFO_BLOCK_KEY_DECRYPT_FAILED": "Decryption of block key failed. Check that you passed the correct private key to the SgidClient constructor.",
     "USERINFO_DATA_DECRYPT_FAILED": "Decryption of data failed. Check that you passed the correct private key to the SgidClient constructor.",
+    "CODE_VERIFIER_LENGTH_ERROR": "Code verifier should have a minimum length of 43 and a maximum length of 128",
+    "PKCE_PAIR_LENGTH_ERROR": "generate_pkce_pair should receive a minimum length of 43 and a maximum length of 128",
 }
 
 
