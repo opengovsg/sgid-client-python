@@ -48,7 +48,7 @@ class SgidClient:
 
             redirect_uri (str | None): Redirection URI for user to return to your
             application after login. If not provided in the constructor, this must
-            be provided to the authorizationUrl and callback functions.
+            be provided to the authorization_url and callback functions.
 
             hostname (str, optional): Hostname of OpenID provider (sgID). Defaults to "https://api.id.gov.sg".
         """
