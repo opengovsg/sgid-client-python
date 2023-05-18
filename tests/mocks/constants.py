@@ -24,6 +24,9 @@ class MockConstants(TypedDict):
     data: dict[str, any]
 
 
+API_VERSION = 2
+
+
 MOCK_CONSTANTS: MockConstants = {
     "server": {
         # private_key and public_jwks are a matching pair
@@ -32,10 +35,10 @@ MOCK_CONSTANTS: MockConstants = {
         # public jwks which does not correspond to any private key
         "public_jwks_alternate": mock_jwks_alternate,
         "hostname": hostname,
-        "auth_endpoint": f"{hostname}/v2/oauth/authorize",
-        "token_endpoint": f"{hostname}/v2/oauth/token",
-        "userinfo_endpoint": f"{hostname}/v2/oauth/userinfo",
-        "jwks_endpoint": f"{hostname}/v2/.well-known/jwks.json",
+        "auth_endpoint": f"{hostname}/v{API_VERSION}/oauth/authorize",
+        "token_endpoint": f"{hostname}/v{API_VERSION}/oauth/token",
+        "userinfo_endpoint": f"{hostname}/v{API_VERSION}/oauth/userinfo",
+        "jwks_endpoint": f"{hostname}/v{API_VERSION}/.well-known/jwks.json",
     },
     "client": {
         "client_id": "mockClientId",
