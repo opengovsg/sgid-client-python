@@ -1,0 +1,45 @@
+name: Publish to PyPI
+
+on:
+  release:
+    types: [created]
+  # TODO: remove this
+  push:
+    branches:
+      - build/publish
+
+jobs:
+  publish:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11']
+        poetry-version: ['1.4.2']
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up Poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install dependencies
+        run: poetry install
+      - name: Build package distributions
+        run: poetry build
+      - name: Publish package distributions to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        env:
+          # TODO: update this to 'pypi' after testing publishing flow
+          name: testpypi
+          # TODO: update this to https://pypi.org/p/sgid-client after testing publishing flow
+          url: https://test.pypi.org/legacy/
+        permissions:
+          id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
+        # TODO: remove this after testing publishing flow
+        with:
+          repository-url: https://test.pypi.org/legacy/
