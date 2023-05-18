@@ -9,8 +9,8 @@ on:
       - build/publish
 
 jobs:
-  publish:
-    name: Publish to PyPI
+  test-build:
+    name: Run tests and build package distribution
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -29,17 +29,38 @@ jobs:
           poetry-version: ${{ matrix.poetry-version }}
       - name: Install dependencies
         run: poetry install
+      - name: Run tests
+        run: poetry run pytest
       - name: Build package distributions
         run: poetry build
+        # Best practice to separate build and publish jobs,
+        # so any malicious scripts injected into build environment
+        # cannot elevate permissions
+      - name: Upload package distribution artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-${{ env.GITHUB_SHA }}
+          path: dist/
+
+  publish:
+    name: Upload release to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      # TODO: update this to 'pypi' after testing publishing flow
+      name: testpypi
+      # TODO: update this to https://pypi.org/p/sgid-client after testing publishing flow
+      url: https://test.pypi.org/legacy/
+    permissions:
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
+    steps:
+      - name: Download built package distributions
+        uses: actions/download-artifact@v3
+        with:
+          name: dist-${{ env.GITHUB_SHA }}
+          path: dist/
+      # TODO: change this to "Publish package distributions to PyPI"
       - name: Publish package distributions to TestPyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        env:
-          # TODO: update this to 'pypi' after testing publishing flow
-          name: testpypi
-          # TODO: update this to https://pypi.org/p/sgid-client after testing publishing flow
-          url: https://test.pypi.org/legacy/
-        permissions:
-          id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
         # TODO: remove this after testing publishing flow
         with:
           repository-url: https://test.pypi.org/legacy/
