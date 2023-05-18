@@ -3,10 +3,6 @@ name: Publish to PyPI
 on:
   release:
     types: [created]
-  # TODO: remove this
-  push:
-    branches:
-      - build/publish
 
 jobs:
   build:
@@ -47,10 +43,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment:
-      # TODO: update this to 'pypi' after testing publishing flow
-      name: testpypi
-      # TODO: update this to https://pypi.org/p/sgid-client after testing publishing flow
-      url: https://test.pypi.org/legacy/
+      name: pypi
+      url: https://pypi.org/p/sgid-client
     permissions:
       id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
@@ -59,9 +53,5 @@ jobs:
         with:
           name: dist-${{ github.sha }}
           path: dist/
-      # TODO: change this to "Publish package distributions to PyPI"
-      - name: Publish package distributions to TestPyPI
+      - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        # TODO: remove this after testing publishing flow
-        with:
-          repository-url: https://test.pypi.org/legacy/
