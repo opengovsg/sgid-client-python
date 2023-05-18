@@ -99,6 +99,8 @@ def userinfo():
 
 @app.route("/api/logout")
 def logout():
+    session_id = request.cookies.get(SESSION_COOKIE_NAME)
+    del session_data[session_id]
     res = make_response({})
     res.delete_cookie(SESSION_COOKIE_NAME)
     return res
