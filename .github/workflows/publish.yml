@@ -9,7 +9,7 @@ on:
       - build/publish
 
 jobs:
-  test-build:
+  build:
     name: Run tests and build package distribution
     runs-on: ubuntu-latest
     strategy:
@@ -44,6 +44,7 @@ jobs:
 
   publish:
     name: Upload release to PyPI
+    needs: build
     runs-on: ubuntu-latest
     environment:
       # TODO: update this to 'pypi' after testing publishing flow
