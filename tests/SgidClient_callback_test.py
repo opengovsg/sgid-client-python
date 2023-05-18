@@ -93,6 +93,18 @@ class TestCallback:
         )
 
         # Assert
+        assert len(responses.calls) == 3  # 1 to token, 2 to jwks
+        assert (
+            responses.calls[0].request.url == MOCK_CONSTANTS["server"]["token_endpoint"]
+        )
+        # call to get jwks for which signature validation fails
+        assert (
+            responses.calls[1].request.url == MOCK_CONSTANTS["server"]["jwks_endpoint"]
+        )
+        # call to get updated jwks
+        assert (
+            responses.calls[2].request.url == MOCK_CONSTANTS["server"]["jwks_endpoint"]
+        )
         assert sub_and_access_token["sub"] == MOCK_CONSTANTS["data"]["sub"]
         assert (
             sub_and_access_token["access_token"]
