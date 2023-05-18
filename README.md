@@ -140,7 +140,9 @@ userinfo(sub: str, access_token: str)
 Example usage:
 
 ```python
-userinfo = sgid_client.userinfo(sub=session["sub"], access_token=access_token)
+userinfo = sgid_client.userinfo(
+    sub=session["sub"], access_token=session["access_token"]
+)
 ```
 
 ## Supported Runtime and Environment
