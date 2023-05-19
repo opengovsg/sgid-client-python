@@ -22,6 +22,7 @@ class SgidClientError(TypedDict):
     ACCESS_TOKEN_INVALID: str
     USERINFO_ENDPOINT_FAILED: str
     JWKS_ENDPOINT_FAILED: str
+    PRIVATE_KEY_IMPORT: str
     USERINFO_SUB_MISMATCH: str
     USERINFO_BLOCK_KEY_DECRYPT_FAILED: str
     USERINFO_DATA_DECRYPT_FAILED: str
@@ -48,6 +49,7 @@ Errors: SgidClientError = {
     "USERINFO_ENDPOINT_FAILED": "sgID responded with an error at the userinfo endpoint",
     "JWKS_ENDPOINT_FAILED": "sgID responded with an error at the jwks endpoint",
     "USERINFO_SUB_MISMATCH": "Sub returned by sgID did not match the sub passed to the userinfo method. Check that you passed the correct sub to the userinfo method.",
+    "PRIVATE_KEY_IMPORT": "Failed to import private key. Check that privateKey is a valid PKCS1 or PKCS8 key.",
     "USERINFO_BLOCK_KEY_DECRYPT_FAILED": "Decryption of block key failed. Check that you passed the correct private key to the SgidClient constructor.",
     "USERINFO_DATA_DECRYPT_FAILED": "Decryption of data failed. Check that you passed the correct private key to the SgidClient constructor.",
     "CODE_VERIFIER_LENGTH_ERROR": "Code verifier should have a minimum length of 43 and a maximum length of 128",
