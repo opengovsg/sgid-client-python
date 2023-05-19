@@ -42,9 +42,9 @@ class SgidClient:
         Args:
             client_id (str): Client ID provided during client registration.
 
-            client_secret (str): Client secret provided during client registration
+            client_secret (str): Client secret provided during client registration.
 
-            private_key (str): Client private key provided during client registration
+            private_key (str): Client private key provided during client registration.
 
             redirect_uri (str | None, optional): Redirection URI for user to return to your
             application after login. If not provided in the constructor, this must
@@ -70,7 +70,7 @@ class SgidClient:
         """Generates authorization url to redirect end-user to sgID login page.
 
         Args:
-            code_challenge (str): The code challenge generated from generate_pkce_pair()
+            code_challenge (str): The code challenge generated from generate_pkce_pair().
 
             state (str | None, optional): A string which will be passed back to your application once
             the end-user logs in. You can also use this to track per-request state.
@@ -88,10 +88,10 @@ class SgidClient:
             specify None for this param.. Defaults to secrets.token_urlsafe(32).
 
         Raises:
-            Exception: if redirect URI is provided in neither the constructor nor this function
+            Exception: if redirect URI is provided in neither the constructor nor this function.
 
         Returns:
-            AuthorizationUrlReturn: authorization URL and nonce
+            AuthorizationUrlReturn: authorization URL and nonce.
         """
         if redirect_uri is None and self.redirect_uri is None:
             raise Exception(Errors["MISSING_REDIRECT_URI"])
@@ -123,10 +123,10 @@ class SgidClient:
         """Exchanges authorization code for access token.
 
         Args:
-            code (str): The authorization code received from the authorization server
+            code (str): The authorization code received from the authorization server.
 
             code_verifier (str): The code verifier corresponding to the code challenge
-            that was passed to `authorization_url` for this request
+            that was passed to `authorization_url` for this request.
 
             nonce (str | None, optional): Nonce passed to `authorization_url` for this
             request. Specify None if no nonce was passed to `authorization_url`.
@@ -137,10 +137,10 @@ class SgidClient:
             to the SgidClient constructor.
 
         Raises:
-            Exception: if call to token endpoint fails
-            Exception: if call to JWKS endpoint fails
-            Exception: if ID token validation fails
-            Exception: if access token validation fails
+            Exception: if call to token endpoint fails.
+            Exception: if call to JWKS endpoint fails.
+            Exception: if ID token validation fails.
+            Exception: if access token validation fails.
 
         Returns:
             CallbackReturn: The sub (subject identifier claim) of the user and
@@ -180,15 +180,15 @@ class SgidClient:
         """Retrieves verified user info and decrypts it with your private key.
 
         Args:
-            sub (str): The sub returned from the callback function
+            sub (str): The sub returned from the callback function.
 
-            access_token (str): The access token returned from the callback function
+            access_token (str): The access token returned from the callback function.
 
         Raises:
-            Exception: if call to userinfo endpoint fails
+            Exception: if call to userinfo endpoint fails.
             Exception: if sub returned from userinfo endpoint does not match
-            sub passed to this function
-            Exception: if decryption fails
+            sub passed to this function.
+            Exception: if decryption fails.
 
         Returns:
             UserInfoReturn: The sub of the end-user and the end-user's verified data.
