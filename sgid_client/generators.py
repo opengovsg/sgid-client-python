@@ -27,7 +27,7 @@ def generate_code_verifier(length=43) -> str:
         raise Exception(Errors["CODE_VERIFIER_LENGTH_ERROR"])
     bytes = secrets.token_bytes(96)
     encoded = urlsafe_b64encode(bytes)
-    return encoded.decode("utf-8")[:length]
+    return encoded.decode("ascii")[:length]
 
 
 def generate_code_challenge(code_verifier: str) -> str:
@@ -39,9 +39,9 @@ def generate_code_challenge(code_verifier: str) -> str:
     Returns:
         str: The calculated code challenge.
     """
-    verifier_bytearray = bytearray(code_verifier, encoding="utf-8")
+    verifier_bytearray = bytearray(code_verifier, encoding="ascii")
     code_challenge_hash = hashlib.sha256(verifier_bytearray).digest()
-    with_padding = urlsafe_b64encode(code_challenge_hash).decode("utf-8")
+    with_padding = urlsafe_b64encode(code_challenge_hash).decode("ascii")
     # Slice off padding characters as they are not valid for code challenge
     # or verifier. This does not affect the validity of the code challenge
     return with_padding.replace("=", "")
