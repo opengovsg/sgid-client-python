@@ -1,3 +1,4 @@
+import pytest
 from sgid_client.SgidClient import SgidClient
 from tests.mocks.constants import MOCK_CONSTANTS
 from tests.mocks.helpers import get_client
@@ -17,3 +18,10 @@ class TestConstructor:
     def test_hostname_default(self):
         client = get_client(delete_args=["hostname"])
         assert client.issuer == "https://api.id.gov.sg/v2"
+
+    def test_private_key_error(self):
+        with pytest.raises(
+            Exception,
+            match="Failed to import private key. Check that privateKey is a valid PKCS1 or PKCS8 key.",
+        ):
+            client = get_client(private_key="invalid_key")
