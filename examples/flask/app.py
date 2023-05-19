@@ -86,7 +86,11 @@ def callback():
 def userinfo():
     session_id = request.cookies.get(SESSION_COOKIE_NAME)
     session = session_data.get(session_id, None)
-    access_token = None if session is None else session["access_token"]
+    access_token = (
+        None
+        if session is None or "access_token" not in session
+        else session["access_token"]
+    )
     if session is None or access_token is None:
         abort(401)
     userinfo = sgid_client.userinfo(sub=session["sub"], access_token=access_token)
