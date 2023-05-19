@@ -74,6 +74,5 @@ poetry add <your-dependency-name>
 Then update the `requirements.txt`:
 
 ```
-rm requirements.txt
-poetry export > requirements.txt
+poetry export --output requirements.txt
 ```
