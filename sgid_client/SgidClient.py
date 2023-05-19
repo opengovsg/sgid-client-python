@@ -34,7 +34,7 @@ class SgidClient:
         client_id: str,
         client_secret: str,
         private_key: str,
-        redirect_uri: str | None,
+        redirect_uri: str | None = None,
         hostname: str = "https://api.id.gov.sg",
     ):
         """Initialises an SgidClient instance.
@@ -46,7 +46,7 @@ class SgidClient:
 
             private_key (str): Client private key provided during client registration
 
-            redirect_uri (str | None): Redirection URI for user to return to your
+            redirect_uri (str | None, optional): Redirection URI for user to return to your
             application after login. If not provided in the constructor, this must
             be provided to the authorization_url and callback functions.
 
@@ -61,8 +61,8 @@ class SgidClient:
 
     def authorization_url(
         self,
-        state: str,
         code_challenge: str,
+        state: str | None = None,
         redirect_uri: str | None = None,
         scope: str | list[str] = "openid myinfo.name",
         nonce: str | None = secrets.token_urlsafe(32),
@@ -70,10 +70,10 @@ class SgidClient:
         """Generates authorization url to redirect end-user to sgID login page.
 
         Args:
-            state (str): A string which will be passed back to your application once
-            the end-user logs in. You can also use this to track per-request state.
-
             code_challenge (str): The code challenge generated from generate_pkce_pair()
+
+            state (str | None, optional): A string which will be passed back to your application once
+            the end-user logs in. You can also use this to track per-request state.
 
             redirect_uri (str | None, optional): The redirect URI used in the authorization
             request. If this param is provided, it will be used instead of the redirect
@@ -100,10 +100,11 @@ class SgidClient:
             "scope": " ".join(scope) if isinstance(scope, list) else scope,
             "redirect_uri": self.redirect_uri if redirect_uri is None else redirect_uri,
             "response_type": "code",
-            "state": state,
             "code_challenge": code_challenge,
             "code_challenge_method": "S256",
         }
+        if state is not None:
+            params["state"] = state
         if nonce is not None:
             params["nonce"] = nonce
         auth_url = f"{self.issuer}/oauth/authorize?{urlencode(params)}"
