@@ -1,22 +1,19 @@
 from flask import (
     Flask,
-    send_from_directory,
     request,
     make_response,
     redirect,
     abort,
 )
+from flask_cors import CORS
 import os
-from fetch_static import fetch_static
 from sgid_client import SgidClient, generate_pkce_pair
 from dotenv import load_dotenv
 from uuid import uuid4
 from urllib.parse import urlencode, parse_qs
-import webbrowser
 
 load_dotenv()
 
-fetch_static.fetch_static_files()
 
 # In-memory store for user session data
 # In a real application, this would be a database.
@@ -24,11 +21,15 @@ session_data = {}
 SESSION_COOKIE_NAME = "exampleAppSession"
 
 app = Flask(__name__)
+# Allow app to interact with demo frontend
+frontend_host = os.getenv("SGID_FRONTEND_HOST") or "http://localhost:5173"
+CORS(app, origins=[frontend_host], supports_credentials=True)
+
 sgid_client = SgidClient(
     client_id=os.getenv("SGID_CLIENT_ID"),
     client_secret=os.getenv("SGID_CLIENT_SECRET"),
     private_key=os.getenv("SGID_PRIVATE_KEY"),
-    redirect_uri="http://localhost:2000/api/callback",
+    redirect_uri="http://localhost:5001/api/callback",
 )
 
 
@@ -69,7 +70,7 @@ def callback():
     session = session_data.get(session_id, None)
     # Validate that the state matches what we passed to sgID for this session
     if session is None or session["state"] != state:
-        return redirect("/error")
+        return redirect(f"{frontend_host}/error")
 
     sub_and_access_token = sgid_client.callback(
         code=auth_code, code_verifier=session["code_verifier"], nonce=session["nonce"]
@@ -78,7 +79,7 @@ def callback():
     session["sub"] = sub_and_access_token["sub"]
     session_data[session_id] = session
 
-    return redirect("/logged-in")
+    return redirect(f"{frontend_host}/logged-in")
 
 
 @app.route("/api/userinfo")
@@ -104,15 +105,3 @@ def logout():
     res = make_response({})
     res.delete_cookie(SESSION_COOKIE_NAME)
     return res
-
-
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-def serve(path):
-    if path != "" and os.path.exists(app.static_folder + "/" + path):
-        return send_from_directory(app.static_folder, path)
-    else:
-        return send_from_directory(app.static_folder, "index.html")
-
-
-webbrowser.open("http://localhost:2000")
