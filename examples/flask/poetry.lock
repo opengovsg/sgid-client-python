@@ -540,7 +540,7 @@ requests = "^2.30.0"
 type = "git"
 url = "https://github.com/opengovsg/sgid-client-python.git"
 reference = "feat/init-build"
-resolved_reference = "345d2e32f57af5ab15ae64b5cc67768a3d20e025"
+resolved_reference = "157295909be744f20eacc92c6f5500739d9280f2"
 
 [[package]]
 name = "six"
