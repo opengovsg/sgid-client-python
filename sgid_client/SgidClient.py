@@ -9,6 +9,9 @@ from .error import Errors, get_network_error_message, get_www_authenticate_error
 from .util import convert_to_pkcs8
 
 API_VERSION = 2
+SGID_RESPONSE_TYPE = "code"
+SGID_CODE_CHALLENGE_METHOD = "S256"
+SGID_GRANT_TYPE = "authorization_code"
 
 
 class AuthorizationUrlReturn(TypedDict):
@@ -99,9 +102,9 @@ class SgidClient:
             "client_id": self.client_id,
             "scope": " ".join(scope) if isinstance(scope, list) else scope,
             "redirect_uri": self.redirect_uri if redirect_uri is None else redirect_uri,
-            "response_type": "code",
+            "response_type": SGID_RESPONSE_TYPE,
             "code_challenge": code_challenge,
-            "code_challenge_method": "S256",
+            "code_challenge_method": SGID_CODE_CHALLENGE_METHOD,
         }
         if state is not None:
             params["state"] = state
@@ -152,7 +155,7 @@ class SgidClient:
             "client_secret": self.client_secret,
             "redirect_uri": self.redirect_uri if redirect_uri is None else redirect_uri,
             "code": code,
-            "grant_type": "authorization_code",
+            "grant_type": SGID_GRANT_TYPE,
             "code_verifier": code_verifier,
         }
         res = requests.post(url, data)
