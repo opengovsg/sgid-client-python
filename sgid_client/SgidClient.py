@@ -78,14 +78,14 @@ class SgidClient:
             redirect_uri (str | None, optional): The redirect URI used in the authorization
             request. If this param is provided, it will be used instead of the redirect
             URI provided in the SgidClient constructor. If not provided in the constructor,
-            the redirect URI must be provided here.. Defaults to None.
+            the redirect URI must be provided here. Defaults to None.
 
             scope (str | list[str], optional): 'openid' must be provided as a
             scope. Defaults to "openid myinfo.name".
 
             nonce (str | None, optional): Unique nonce for this request. If this param is
             not provided, a nonce is generated and returned. To prevent this behaviour,
-            specify None for this param.. Defaults to secrets.token_urlsafe(32).
+            specify None for this param. Defaults to secrets.token_urlsafe(32).
 
         Raises:
             Exception: if redirect URI is provided in neither the constructor nor this function.
