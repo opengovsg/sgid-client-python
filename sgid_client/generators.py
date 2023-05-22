@@ -49,7 +49,7 @@ def generate_code_challenge(code_verifier: str) -> str:
 
 def generate_pkce_pair(length=43) -> GeneratePkcePairReturn:
     """Generates a challenge pair where `code_challenge`
-    is the generated S256 hash from `code_verifier`
+    is the generated S256 hash from `code_verifier`.
 
     Args:
         length (int, optional): The length of the code verifier. Defaults to 43.
