@@ -47,16 +47,16 @@ def get_auth_url():
     # We pass the user's ice cream preference as the state,
     # so after they log in, we can display it together with the
     # other user info.
-    pkce_pair = generate_pkce_pair()
+    code_verifier, code_challenge = generate_pkce_pair()
     auth_url_and_nonce = sgid_client.authorization_url(
-        state=state, code_challenge=pkce_pair["code_challenge"]
+        state=state, code_challenge=code_challenge
     )
     session_data[session_id] = {
         "state": state,
-        "nonce": auth_url_and_nonce["nonce"],
-        "code_verifier": pkce_pair["code_verifier"],
+        "nonce": auth_url_and_nonce.nonce,
+        "code_verifier": code_verifier,
     }
-    res = make_response({"url": auth_url_and_nonce["url"]})
+    res = make_response({"url": auth_url_and_nonce.url})
     res.set_cookie(SESSION_COOKIE_NAME, session_id, httponly=True)
     return res
 
@@ -72,11 +72,11 @@ def callback():
     if session is None or session["state"] != state:
         return redirect(f"{frontend_host}/error")
 
-    sub_and_access_token = sgid_client.callback(
+    sub, access_token = sgid_client.callback(
         code=auth_code, code_verifier=session["code_verifier"], nonce=session["nonce"]
     )
-    session["access_token"] = sub_and_access_token["access_token"]
-    session["sub"] = sub_and_access_token["sub"]
+    session["access_token"] = access_token
+    session["sub"] = sub
     session_data[session_id] = session
 
     return redirect(f"{frontend_host}/logged-in")
@@ -93,13 +93,13 @@ def userinfo():
     )
     if session is None or access_token is None:
         abort(401)
-    userinfo = sgid_client.userinfo(sub=session["sub"], access_token=access_token)
+    sub, data = sgid_client.userinfo(sub=session["sub"], access_token=access_token)
 
     # Add ice cream flavour to userinfo
     ice_cream_selection = parse_qs(session["state"])["icecream"][0]
-    userinfo["data"]["iceCream"] = ice_cream_selection
+    data["iceCream"] = ice_cream_selection
 
-    return userinfo
+    return {"sub": sub, "data": data}
 
 
 @app.route("/api/logout")
