@@ -18,25 +18,25 @@ class TestAuthorizationUrl:
         mock_code_challenge = "mockCodeChallenge"
 
         # Act
-        url_and_nonce = client.authorization_url(
+        url, nonce = client.authorization_url(
             state=mock_state, code_challenge=mock_code_challenge
         )
-        url = urlparse(url_and_nonce["url"])
-        query = parse_qs(url.query)
+        parsed_url = urlparse(url)
+        query = parse_qs(parsed_url.query)
 
         # Assert
         assert (
-            f"{url.scheme}://{url.hostname}{url.path}"
-            == MOCK_CONSTANTS["server"]["auth_endpoint"]
+            f"{parsed_url.scheme}://{parsed_url.hostname}{parsed_url.path}"
+            == MOCK_CONSTANTS.server["auth_endpoint"]
         )
         # No repeated values
         for val in query.values():
             assert len(val) == 1
-        assert query["client_id"][0] == MOCK_CONSTANTS["client"]["client_id"]
+        assert query["client_id"][0] == MOCK_CONSTANTS.client["client_id"]
         assert query["scope"][0] == DEFAULT_SCOPE
         assert query["response_type"][0] == DEFAULT_RESPONSE_TYPE
-        assert query["redirect_uri"][0] == MOCK_CONSTANTS["client"]["redirect_uri"]
-        assert query["nonce"][0] == url_and_nonce["nonce"]
+        assert query["redirect_uri"][0] == MOCK_CONSTANTS.client["redirect_uri"]
+        assert query["nonce"][0] == nonce
         assert query["state"][0] == mock_state
         assert query["code_challenge"][0] == mock_code_challenge
         assert query["code_challenge_method"][0] == DEFAULT_SGID_CODE_CHALLENGE_METHOD
@@ -51,25 +51,25 @@ class TestAuthorizationUrl:
         mock_scope = "mockScope"
 
         # Act
-        url_and_nonce = client.authorization_url(
+        url, nonce = client.authorization_url(
             state=mock_state, code_challenge=mock_code_challenge, scope=mock_scope
         )
-        url = urlparse(url_and_nonce["url"])
-        query = parse_qs(url.query)
+        parsed_url = urlparse(url)
+        query = parse_qs(parsed_url.query)
 
         # Assert
         assert (
-            f"{url.scheme}://{url.hostname}{url.path}"
-            == MOCK_CONSTANTS["server"]["auth_endpoint"]
+            f"{parsed_url.scheme}://{parsed_url.hostname}{parsed_url.path}"
+            == MOCK_CONSTANTS.server["auth_endpoint"]
         )
         # No repeated values
         for val in query.values():
             assert len(val) == 1
-        assert query["client_id"][0] == MOCK_CONSTANTS["client"]["client_id"]
+        assert query["client_id"][0] == MOCK_CONSTANTS.client["client_id"]
         assert query["scope"][0] == mock_scope
         assert query["response_type"][0] == DEFAULT_RESPONSE_TYPE
-        assert query["redirect_uri"][0] == MOCK_CONSTANTS["client"]["redirect_uri"]
-        assert query["nonce"][0] == url_and_nonce["nonce"]
+        assert query["redirect_uri"][0] == MOCK_CONSTANTS.client["redirect_uri"]
+        assert query["nonce"][0] == nonce
         assert query["state"][0] == mock_state
         assert query["code_challenge"][0] == mock_code_challenge
         assert query["code_challenge_method"][0] == DEFAULT_SGID_CODE_CHALLENGE_METHOD
@@ -84,25 +84,25 @@ class TestAuthorizationUrl:
         mock_scope = ["scope1", "scope2", "scope3"]
 
         # Act
-        url_and_nonce = client.authorization_url(
+        url, nonce = client.authorization_url(
             state=mock_state, code_challenge=mock_code_challenge, scope=mock_scope
         )
-        url = urlparse(url_and_nonce["url"])
-        query = parse_qs(url.query)
+        parsed_url = urlparse(url)
+        query = parse_qs(parsed_url.query)
 
         # Assert
         assert (
-            f"{url.scheme}://{url.hostname}{url.path}"
-            == MOCK_CONSTANTS["server"]["auth_endpoint"]
+            f"{parsed_url.scheme}://{parsed_url.hostname}{parsed_url.path}"
+            == MOCK_CONSTANTS.server["auth_endpoint"]
         )
         # No repeated values
         for val in query.values():
             assert len(val) == 1
-        assert query["client_id"][0] == MOCK_CONSTANTS["client"]["client_id"]
+        assert query["client_id"][0] == MOCK_CONSTANTS.client["client_id"]
         assert query["scope"][0] == " ".join(mock_scope)
         assert query["response_type"][0] == DEFAULT_RESPONSE_TYPE
-        assert query["redirect_uri"][0] == MOCK_CONSTANTS["client"]["redirect_uri"]
-        assert query["nonce"][0] == url_and_nonce["nonce"]
+        assert query["redirect_uri"][0] == MOCK_CONSTANTS.client["redirect_uri"]
+        assert query["nonce"][0] == nonce
         assert query["state"][0] == mock_state
         assert query["code_challenge"][0] == mock_code_challenge
         assert query["code_challenge_method"][0] == DEFAULT_SGID_CODE_CHALLENGE_METHOD
@@ -117,26 +117,26 @@ class TestAuthorizationUrl:
         mock_nonce = "mockNonce"
 
         # Act
-        url_and_nonce = client.authorization_url(
+        url, nonce = client.authorization_url(
             state=mock_state, code_challenge=mock_code_challenge, nonce=mock_nonce
         )
-        url = urlparse(url_and_nonce["url"])
-        query = parse_qs(url.query)
+        parsed_url = urlparse(url)
+        query = parse_qs(parsed_url.query)
 
         # Assert
         assert (
-            f"{url.scheme}://{url.hostname}{url.path}"
-            == MOCK_CONSTANTS["server"]["auth_endpoint"]
+            f"{parsed_url.scheme}://{parsed_url.hostname}{parsed_url.path}"
+            == MOCK_CONSTANTS.server["auth_endpoint"]
         )
         # No repeated values
         for val in query.values():
             assert len(val) == 1
-        assert query["client_id"][0] == MOCK_CONSTANTS["client"]["client_id"]
+        assert query["client_id"][0] == MOCK_CONSTANTS.client["client_id"]
         assert query["scope"][0] == DEFAULT_SCOPE
         assert query["response_type"][0] == DEFAULT_RESPONSE_TYPE
-        assert query["redirect_uri"][0] == MOCK_CONSTANTS["client"]["redirect_uri"]
-        assert query["nonce"][0] == url_and_nonce["nonce"]
-        assert url_and_nonce["nonce"] == mock_nonce
+        assert query["redirect_uri"][0] == MOCK_CONSTANTS.client["redirect_uri"]
+        assert query["nonce"][0] == nonce
+        assert nonce == mock_nonce
         assert query["state"][0] == mock_state
         assert query["code_challenge"][0] == mock_code_challenge
         assert query["code_challenge_method"][0] == DEFAULT_SGID_CODE_CHALLENGE_METHOD
@@ -150,25 +150,25 @@ class TestAuthorizationUrl:
         mock_code_challenge = "mockCodeChallenge"
 
         # Act
-        url_and_nonce = client.authorization_url(
+        url, nonce = client.authorization_url(
             state=mock_state, code_challenge=mock_code_challenge, nonce=None
         )
-        url = urlparse(url_and_nonce["url"])
-        query = parse_qs(url.query)
+        parsed_url = urlparse(url)
+        query = parse_qs(parsed_url.query)
 
         # Assert
         assert (
-            f"{url.scheme}://{url.hostname}{url.path}"
-            == MOCK_CONSTANTS["server"]["auth_endpoint"]
+            f"{parsed_url.scheme}://{parsed_url.hostname}{parsed_url.path}"
+            == MOCK_CONSTANTS.server["auth_endpoint"]
         )
         # No repeated values
         for val in query.values():
             assert len(val) == 1
-        assert query["client_id"][0] == MOCK_CONSTANTS["client"]["client_id"]
+        assert query["client_id"][0] == MOCK_CONSTANTS.client["client_id"]
         assert query["scope"][0] == DEFAULT_SCOPE
         assert query["response_type"][0] == DEFAULT_RESPONSE_TYPE
-        assert query["redirect_uri"][0] == MOCK_CONSTANTS["client"]["redirect_uri"]
-        assert url_and_nonce["nonce"] is None
+        assert query["redirect_uri"][0] == MOCK_CONSTANTS.client["redirect_uri"]
+        assert nonce is None
         assert query["state"][0] == mock_state
         assert query["code_challenge"][0] == mock_code_challenge
         assert query["code_challenge_method"][0] == DEFAULT_SGID_CODE_CHALLENGE_METHOD
@@ -183,27 +183,27 @@ class TestAuthorizationUrl:
         mock_redirect_uri = "mockRedirectUri"
 
         # Act
-        url_and_nonce = client.authorization_url(
+        url, nonce = client.authorization_url(
             state=mock_state,
             code_challenge=mock_code_challenge,
             redirect_uri=mock_redirect_uri,
         )
-        url = urlparse(url_and_nonce["url"])
-        query = parse_qs(url.query)
+        parsed_url = urlparse(url)
+        query = parse_qs(parsed_url.query)
 
         # Assert
         assert (
-            f"{url.scheme}://{url.hostname}{url.path}"
-            == MOCK_CONSTANTS["server"]["auth_endpoint"]
+            f"{parsed_url.scheme}://{parsed_url.hostname}{parsed_url.path}"
+            == MOCK_CONSTANTS.server["auth_endpoint"]
         )
         # No repeated values
         for val in query.values():
             assert len(val) == 1
-        assert query["client_id"][0] == MOCK_CONSTANTS["client"]["client_id"]
+        assert query["client_id"][0] == MOCK_CONSTANTS.client["client_id"]
         assert query["scope"][0] == DEFAULT_SCOPE
         assert query["response_type"][0] == DEFAULT_RESPONSE_TYPE
         assert query["redirect_uri"][0] == mock_redirect_uri
-        assert query["nonce"][0] == url_and_nonce["nonce"]
+        assert query["nonce"][0] == nonce
         assert query["state"][0] == mock_state
         assert query["code_challenge"][0] == mock_code_challenge
         assert query["code_challenge_method"][0] == DEFAULT_SGID_CODE_CHALLENGE_METHOD

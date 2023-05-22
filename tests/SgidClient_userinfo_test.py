@@ -13,10 +13,10 @@ from tests.mocks.helpers import (
 class TestUserInfo:
     def userinfo_callback(self, request: Request):
         auth_header: str = request.headers.get("authorization")
-        if auth_header != f"Bearer {MOCK_CONSTANTS['data']['access_token']}":
+        if auth_header != f"Bearer {MOCK_CONSTANTS.data['access_token']}":
             return (401, {}, {})
         result = {
-            "sub": MOCK_CONSTANTS["data"]["sub"],
+            "sub": MOCK_CONSTANTS.data["sub"],
             "key": generate_encrypted_block_key(),
             "data": generate_user_info(),
         }
@@ -27,28 +27,28 @@ class TestUserInfo:
         # Arrange
         responses.add_callback(
             responses.GET,
-            MOCK_CONSTANTS["server"]["userinfo_endpoint"],
+            MOCK_CONSTANTS.server["userinfo_endpoint"],
             callback=self.userinfo_callback,
             content_type="application/json",
         )
         client = get_client()
 
         # Act
-        sub_and_data = client.userinfo(
-            sub=MOCK_CONSTANTS["data"]["sub"],
-            access_token=MOCK_CONSTANTS["data"]["access_token"],
+        sub, data = client.userinfo(
+            sub=MOCK_CONSTANTS.data["sub"],
+            access_token=MOCK_CONSTANTS.data["access_token"],
         )
 
         # Assert
-        assert sub_and_data["sub"] == MOCK_CONSTANTS["data"]["sub"]
-        assert sub_and_data["data"] == MOCK_CONSTANTS["data"]["userinfo"]
+        assert sub == MOCK_CONSTANTS.data["sub"]
+        assert data == MOCK_CONSTANTS.data["userinfo"]
 
     @responses.activate
     def test_userinfo_endpoint_failure_no_res_headers(self):
         # Arrange
         response_json = {"message": "Your request is invalid"}
         responses.get(
-            url=MOCK_CONSTANTS["server"]["userinfo_endpoint"],
+            url=MOCK_CONSTANTS.server["userinfo_endpoint"],
             json=response_json,
             status=400,
         )
@@ -59,9 +59,9 @@ class TestUserInfo:
             Exception,
             match=f"sgID responded with an error at the userinfo endpoint\nResponse status: 400\nResponse body: {json.dumps(response_json)}",
         ):
-            sub_and_data = client.userinfo(
-                sub=MOCK_CONSTANTS["data"]["sub"],
-                access_token=MOCK_CONSTANTS["data"]["access_token"],
+            sub, data = client.userinfo(
+                sub=MOCK_CONSTANTS.data["sub"],
+                access_token=MOCK_CONSTANTS.data["access_token"],
             )
 
     @responses.activate
@@ -70,7 +70,7 @@ class TestUserInfo:
         response_json = {"message": "Your request is invalid"}
         www_auth_message = "Your request failed"
         responses.get(
-            url=MOCK_CONSTANTS["server"]["userinfo_endpoint"],
+            url=MOCK_CONSTANTS.server["userinfo_endpoint"],
             json=response_json,
             headers={"www-authenticate": f"error={www_auth_message}"},
             status=400,
@@ -82,9 +82,9 @@ class TestUserInfo:
             Exception,
             match=f"sgID responded with an error at the userinfo endpoint\nResponse status: 400\nError message: {www_auth_message}",
         ):
-            sub_and_data = client.userinfo(
-                sub=MOCK_CONSTANTS["data"]["sub"],
-                access_token=MOCK_CONSTANTS["data"]["access_token"],
+            sub, data = client.userinfo(
+                sub=MOCK_CONSTANTS.data["sub"],
+                access_token=MOCK_CONSTANTS.data["access_token"],
             )
 
     @responses.activate
@@ -93,7 +93,7 @@ class TestUserInfo:
         response_json = {"message": "Your request is invalid"}
         www_auth_message = "Your request failed"
         responses.get(
-            url=MOCK_CONSTANTS["server"]["userinfo_endpoint"],
+            url=MOCK_CONSTANTS.server["userinfo_endpoint"],
             json=response_json,
             headers={"www-authenticate": www_auth_message},
             status=400,
@@ -105,9 +105,9 @@ class TestUserInfo:
             Exception,
             match=f"sgID responded with an error at the userinfo endpoint\nResponse status: 400\nError message: {www_auth_message}",
         ):
-            sub_and_data = client.userinfo(
-                sub=MOCK_CONSTANTS["data"]["sub"],
-                access_token=MOCK_CONSTANTS["data"]["access_token"],
+            sub, data = client.userinfo(
+                sub=MOCK_CONSTANTS.data["sub"],
+                access_token=MOCK_CONSTANTS.data["access_token"],
             )
 
     @responses.activate
@@ -115,7 +115,7 @@ class TestUserInfo:
         # Arrange
         responses.add_callback(
             responses.GET,
-            MOCK_CONSTANTS["server"]["userinfo_endpoint"],
+            MOCK_CONSTANTS.server["userinfo_endpoint"],
             callback=self.userinfo_callback,
             content_type="application/json",
         )
@@ -127,18 +127,18 @@ class TestUserInfo:
             Exception,
             match=f"Sub returned by sgID did not match the sub passed to the userinfo method. Check that you passed the correct sub to the userinfo method.",
         ):
-            sub_and_data = client.userinfo(
+            sub, data = client.userinfo(
                 sub=sub_passed_to_userinfo,
-                access_token=MOCK_CONSTANTS["data"]["access_token"],
+                access_token=MOCK_CONSTANTS.data["access_token"],
             )
 
     @responses.activate
     def test_userinfo_block_key_decrypt_error(self):
         # Arrange
         responses.get(
-            url=MOCK_CONSTANTS["server"]["userinfo_endpoint"],
+            url=MOCK_CONSTANTS.server["userinfo_endpoint"],
             json={
-                "sub": MOCK_CONSTANTS["data"]["sub"],
+                "sub": MOCK_CONSTANTS.data["sub"],
                 "key": "invalidKey",
                 "data": generate_user_info(),
             },
@@ -150,18 +150,18 @@ class TestUserInfo:
             Exception,
             match=f"Decryption of block key failed. Check that you passed the correct private key to the SgidClient constructor.",
         ):
-            sub_and_data = client.userinfo(
-                sub=MOCK_CONSTANTS["data"]["sub"],
-                access_token=MOCK_CONSTANTS["data"]["access_token"],
+            sub, data = client.userinfo(
+                sub=MOCK_CONSTANTS.data["sub"],
+                access_token=MOCK_CONSTANTS.data["access_token"],
             )
 
     @responses.activate
     def test_userinfo_data_decrypt_error(self):
         # Arrange
         responses.get(
-            url=MOCK_CONSTANTS["server"]["userinfo_endpoint"],
+            url=MOCK_CONSTANTS.server["userinfo_endpoint"],
             json={
-                "sub": MOCK_CONSTANTS["data"]["sub"],
+                "sub": MOCK_CONSTANTS.data["sub"],
                 "key": generate_encrypted_block_key(),
                 "data": {"abc": "def"},
             },
@@ -173,7 +173,7 @@ class TestUserInfo:
             Exception,
             match=f"Decryption of data failed. Check that you passed the correct private key to the SgidClient constructor.",
         ):
-            sub_and_data = client.userinfo(
-                sub=MOCK_CONSTANTS["data"]["sub"],
-                access_token=MOCK_CONSTANTS["data"]["access_token"],
+            sub, data = client.userinfo(
+                sub=MOCK_CONSTANTS.data["sub"],
+                access_token=MOCK_CONSTANTS.data["access_token"],
             )

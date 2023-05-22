@@ -13,11 +13,11 @@ from sgid_client.SgidClient import SgidClient
 
 def get_client(delete_args: List[str] = [], **kwargs):
     args = {
-        "client_id": MOCK_CONSTANTS["client"]["client_id"],
-        "client_secret": MOCK_CONSTANTS["client"]["client_secret"],
-        "private_key": MOCK_CONSTANTS["client"]["private_key"],
-        "redirect_uri": MOCK_CONSTANTS["client"]["redirect_uri"],
-        "hostname": MOCK_CONSTANTS["server"]["hostname"],
+        "client_id": MOCK_CONSTANTS.client["client_id"],
+        "client_secret": MOCK_CONSTANTS.client["client_secret"],
+        "private_key": MOCK_CONSTANTS.client["private_key"],
+        "redirect_uri": MOCK_CONSTANTS.client["redirect_uri"],
+        "hostname": MOCK_CONSTANTS.server["hostname"],
     }
     for delete_arg in delete_args:
         del args[delete_arg]
@@ -27,14 +27,14 @@ def get_client(delete_args: List[str] = [], **kwargs):
 
 def create_id_token(
     nonce=None,
-    iss=MOCK_CONSTANTS["server"]["hostname"] + "/v2",
-    sub=MOCK_CONSTANTS["data"]["sub"],
-    aud=MOCK_CONSTANTS["client"]["client_id"],
+    iss=MOCK_CONSTANTS.server["hostname"] + "/v2",
+    sub=MOCK_CONSTANTS.data["sub"],
+    aud=MOCK_CONSTANTS.client["client_id"],
     exp=math.ceil(datetime.now().timestamp() + 10),
     iat=math.ceil(datetime.now().timestamp()),
     header={"alg": "RS256"},
     delete_keys=[],
-    private_key=MOCK_CONSTANTS["server"]["private_key"],
+    private_key=MOCK_CONSTANTS.server["private_key"],
 ) -> str:
     private_key_pkcs8 = RSA.import_key(extern_key=private_key).export_key(pkcs=8)
     private_key_jwk = jwk.JWK.from_pem(private_key_pkcs8)
@@ -61,17 +61,17 @@ def make_base64url_json(content: dict) -> str:
 
 
 def get_jwks_response(
-    url=f"{MOCK_CONSTANTS['server']['hostname']}/v2/.well-known/jwks.json",
-    json=MOCK_CONSTANTS["server"]["public_jwks"],
+    url=f"{MOCK_CONSTANTS.server['hostname']}/v2/.well-known/jwks.json",
+    json=MOCK_CONSTANTS.server["public_jwks"],
 ):
     return responses.Response(method="GET", url=url, json=json)
 
 
 def generate_encrypted_block_key():
     encryption_key = jwk.JWK.from_pem(
-        MOCK_CONSTANTS["client"]["public_key"].encode("utf-8")
+        MOCK_CONSTANTS.client["public_key"].encode("utf-8")
     )
-    payload = json.dumps(MOCK_CONSTANTS["data"]["block_key"])
+    payload = json.dumps(MOCK_CONSTANTS.data["block_key"])
     encrypted = jwe.JWE(
         plaintext=payload,
         protected=json.dumps({"alg": "RSA-OAEP-256", "enc": "A256GCM"}),
@@ -82,8 +82,8 @@ def generate_encrypted_block_key():
 
 def generate_user_info():
     result = {}
-    encryption_key = jwk.JWK.from_json(json.dumps(MOCK_CONSTANTS["data"]["block_key"]))
-    to_encrypt: dict[str, str] = MOCK_CONSTANTS["data"]["userinfo"]
+    encryption_key = jwk.JWK.from_json(json.dumps(MOCK_CONSTANTS.data["block_key"]))
+    to_encrypt: dict[str, str] = MOCK_CONSTANTS.data["userinfo"]
     for k, v in to_encrypt.items():
         encrypted = jwe.JWE(
             plaintext=v, protected=json.dumps({"alg": "A128GCMKW", "enc": "A128GCM"})
