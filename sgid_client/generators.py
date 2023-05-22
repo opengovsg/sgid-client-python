@@ -1,11 +1,11 @@
-from typing import TypedDict
+from typing import NamedTuple
 from .error import Errors
 import secrets
 from base64 import urlsafe_b64encode
 import hashlib
 
 
-class GeneratePkcePairReturn(TypedDict):
+class GeneratePkcePairReturn(NamedTuple):
     code_verifier: str
     code_challenge: str
 
@@ -24,7 +24,7 @@ def generate_code_verifier(length=43) -> str:
         str: The generated code verifier.
     """
     if length < 43 or length > 128:
-        raise Exception(Errors["CODE_VERIFIER_LENGTH_ERROR"])
+        raise Exception(Errors.CODE_VERIFIER_LENGTH_ERROR)
     bytes = secrets.token_bytes(96)
     encoded = urlsafe_b64encode(bytes)
     return encoded.decode("ascii")[:length]
@@ -61,7 +61,7 @@ def generate_pkce_pair(length=43) -> GeneratePkcePairReturn:
         GeneratePkcePairReturn: Code challenge and code verifier.
     """
     if length < 43 or length > 128:
-        raise Exception(Errors["PKCE_PAIR_LENGTH_ERROR"])
+        raise Exception(Errors.PKCE_PAIR_LENGTH_ERROR)
     verifier = generate_code_verifier(length)
     challenge = generate_code_challenge(verifier)
-    return {"code_verifier": verifier, "code_challenge": challenge}
+    return GeneratePkcePairReturn(code_verifier=verifier, code_challenge=challenge)
