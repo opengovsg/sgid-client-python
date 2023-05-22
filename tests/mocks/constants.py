@@ -1,5 +1,5 @@
 import json
-from typing import TypedDict
+from typing import NamedTuple
 import os
 
 mock_dir = os.path.dirname(__file__)
@@ -18,7 +18,7 @@ mock_jwks_alternate = json.load(mock_alternate_jwks_file)
 hostname = "https://id.sgid.com"
 
 
-class MockConstants(TypedDict):
+class MockConstants(NamedTuple):
     server: dict[str, str]
     client: dict[str, str]
     data: dict[str, any]
@@ -27,8 +27,8 @@ class MockConstants(TypedDict):
 API_VERSION = 2
 
 
-MOCK_CONSTANTS: MockConstants = {
-    "server": {
+MOCK_CONSTANTS = MockConstants(
+    server={
         # private_key and public_jwks are a matching pair
         "private_key": mock_private_key_pkcs1.read(),
         "public_jwks": mock_jwks,
@@ -40,7 +40,7 @@ MOCK_CONSTANTS: MockConstants = {
         "userinfo_endpoint": f"{hostname}/v{API_VERSION}/oauth/userinfo",
         "jwks_endpoint": f"{hostname}/v{API_VERSION}/.well-known/jwks.json",
     },
-    "client": {
+    client={
         "client_id": "mockClientId",
         "client_secret": "mockClientSecret",
         "redirect_uri": "https://sgid.com/callback",
@@ -48,7 +48,7 @@ MOCK_CONSTANTS: MockConstants = {
         "private_key": mock_client_keys["privateKey"],
         "private_key_pkcs8": mock_private_key_pkcs8.read(),
     },
-    "data": {
+    data={
         "block_key": {
             "kty": "oct",
             "alg": "A128GCM",
@@ -63,7 +63,7 @@ MOCK_CONSTANTS: MockConstants = {
         "code_verifier": "bbGcObXZC1YGBQZZtZGQH9jsyO1vypqCGqnSU_4TI5S",
         "code_challenge": "zaqUHoBV3rnhBF2g0Gkz1qkpEZXHqi2OrPK1DqRi-Lk",
     },
-}
+)
 
 mock_client_keys_file.close()
 mock_private_key_pkcs1.close()

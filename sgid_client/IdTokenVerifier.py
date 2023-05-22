@@ -12,7 +12,7 @@ class IdTokenVerifier:
         res = requests.get(self.jwks_uri)
         if res.status_code != 200:
             error_message = get_network_error_message(
-                message=Errors["JWKS_ENDPOINT_FAILED"],
+                message=Errors.JWKS_ENDPOINT_FAILED,
                 status=res.status_code,
                 body=res.text,
             )
@@ -30,4 +30,4 @@ class IdTokenVerifier:
             try:
                 jwt_lib.JWT(key=self.jwks_cache, jwt=jwt)
             except:
-                raise Exception(Errors["ID_TOKEN_SIGNATURE_INVALID"])
+                raise Exception(Errors.ID_TOKEN_SIGNATURE_INVALID)

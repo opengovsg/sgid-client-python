@@ -12,7 +12,7 @@ class TestConstructor:
 
     def test_pkcs1(self):
         # Borrow server's PKCS1 private key to test that it imports correctly
-        client = get_client(private_key=MOCK_CONSTANTS["server"]["private_key"])
+        client = get_client(private_key=MOCK_CONSTANTS.server["private_key"])
         assert type(client) is SgidClient
 
     def test_hostname_default(self):

@@ -1,5 +1,5 @@
 import secrets
-from typing import TypedDict
+from typing import NamedTuple
 from urllib.parse import urlparse, urlencode
 import requests
 from .validation import validate_access_token, validate_id_token
@@ -14,17 +14,17 @@ SGID_CODE_CHALLENGE_METHOD = "S256"
 SGID_GRANT_TYPE = "authorization_code"
 
 
-class AuthorizationUrlReturn(TypedDict):
+class AuthorizationUrlReturn(NamedTuple):
     url: str
     nonce: str | None
 
 
-class CallbackReturn(TypedDict):
+class CallbackReturn(NamedTuple):
     sub: str
     access_token: str
 
 
-class UserInfoReturn(TypedDict):
+class UserInfoReturn(NamedTuple):
     sub: str
     data: dict
 
@@ -100,7 +100,7 @@ class SgidClient:
             AuthorizationUrlReturn: authorization URL and nonce.
         """
         if redirect_uri is None and self.redirect_uri is None:
-            raise Exception(Errors["MISSING_REDIRECT_URI"])
+            raise Exception(Errors.MISSING_REDIRECT_URI)
         params = {
             "client_id": self.client_id,
             "scope": " ".join(scope) if isinstance(scope, list) else scope,
@@ -114,10 +114,7 @@ class SgidClient:
         if nonce is not None:
             params["nonce"] = nonce
         auth_url = f"{self.issuer}/oauth/authorize?{urlencode(params)}"
-        return {
-            "url": auth_url,
-            "nonce": nonce,
-        }
+        return AuthorizationUrlReturn(url=auth_url, nonce=nonce)
 
     def callback(
         self,
@@ -164,7 +161,7 @@ class SgidClient:
         res = requests.post(url, data)
         if res.status_code != 200:
             error_message = get_network_error_message(
-                message=Errors["TOKEN_ENDPOINT_FAILED"],
+                message=Errors.TOKEN_ENDPOINT_FAILED,
                 status=res.status_code,
                 body=res.text,
             )
@@ -180,7 +177,7 @@ class SgidClient:
             verifier=self.verifier,
         )
         validate_access_token(access_token=access_token)
-        return {"sub": sub, "access_token": access_token}
+        return CallbackReturn(sub=sub, access_token=access_token)
 
     def userinfo(self, sub: str, access_token: str) -> UserInfoReturn:
         """Retrieves verified user info and decrypts it with your private key.
@@ -207,15 +204,15 @@ class SgidClient:
         res = requests.get(url, headers=headers)
         if res.status_code != 200:
             error_message = get_www_authenticate_error_message(
-                message=Errors["USERINFO_ENDPOINT_FAILED"], res=res
+                message=Errors.USERINFO_ENDPOINT_FAILED, res=res
             )
             raise Exception(error_message)
         res_body = res.json()
         if res_body["sub"] != sub:
-            raise Exception(Errors["USERINFO_SUB_MISMATCH"])
+            raise Exception(Errors.USERINFO_SUB_MISMATCH)
         decrypted_data = decrypt_data(
             encrypted_key=res_body["key"],
             encrypted_data=res_body["data"],
             private_key=self.private_key,
         )
-        return {"data": decrypted_data, "sub": res_body["sub"]}
+        return UserInfoReturn(sub=res_body["sub"], data=decrypted_data)

@@ -34,17 +34,17 @@ class TestGenerateCodeVerifier:
 
 class TestGenerateCodeChallenge:
     def test_hash_correctness(self):
-        challenge = generate_code_challenge(MOCK_CONSTANTS["data"]["code_verifier"])
+        challenge = generate_code_challenge(MOCK_CONSTANTS.data["code_verifier"])
 
         assert re.fullmatch(verifier_challenge_pattern, challenge) is not None
-        assert challenge == MOCK_CONSTANTS["data"]["code_challenge"]
+        assert challenge == MOCK_CONSTANTS.data["code_challenge"]
 
     def test_determinism(self):
-        challenge_1 = generate_code_challenge(MOCK_CONSTANTS["data"]["code_verifier"])
-        challenge_2 = generate_code_challenge(MOCK_CONSTANTS["data"]["code_verifier"])
+        challenge_1 = generate_code_challenge(MOCK_CONSTANTS.data["code_verifier"])
+        challenge_2 = generate_code_challenge(MOCK_CONSTANTS.data["code_verifier"])
 
-        assert challenge_1 == MOCK_CONSTANTS["data"]["code_challenge"]
-        assert challenge_2 == MOCK_CONSTANTS["data"]["code_challenge"]
+        assert challenge_1 == MOCK_CONSTANTS.data["code_challenge"]
+        assert challenge_2 == MOCK_CONSTANTS.data["code_challenge"]
 
 
 class TestGeneratePkcePair:
@@ -57,29 +57,19 @@ class TestGeneratePkcePair:
                 generate_pkce_pair(length=l)
 
     def test_length_default(self):
-        pair = generate_pkce_pair()
-        expected_challenge = sha256_b64url(pair["code_verifier"])
+        code_verifier, code_challenge = generate_pkce_pair()
+        expected_challenge = sha256_b64url(code_verifier)
 
-        assert len(pair["code_verifier"]) == 43
-        assert (
-            re.fullmatch(verifier_challenge_pattern, pair["code_verifier"]) is not None
-        )
-        assert (
-            re.fullmatch(verifier_challenge_pattern, pair["code_challenge"]) is not None
-        )
-        assert pair["code_challenge"] == expected_challenge
+        assert len(code_verifier) == 43
+        assert re.fullmatch(verifier_challenge_pattern, code_verifier) is not None
+        assert re.fullmatch(verifier_challenge_pattern, code_challenge) is not None
+        assert code_challenge == expected_challenge
 
     def test_all_lengths(self):
         for l in range(43, 129):
-            pair = generate_pkce_pair(length=l)
-            expected_challenge = sha256_b64url(pair["code_verifier"])
-            assert len(pair["code_verifier"]) == l
-            assert (
-                re.fullmatch(verifier_challenge_pattern, pair["code_verifier"])
-                is not None
-            )
-            assert (
-                re.fullmatch(verifier_challenge_pattern, pair["code_challenge"])
-                is not None
-            )
-            assert pair["code_challenge"] == expected_challenge
+            code_verifier, code_challenge = generate_pkce_pair(length=l)
+            expected_challenge = sha256_b64url(code_verifier)
+            assert len(code_verifier) == l
+            assert re.fullmatch(verifier_challenge_pattern, code_verifier) is not None
+            assert re.fullmatch(verifier_challenge_pattern, code_challenge) is not None
+            assert code_challenge == expected_challenge

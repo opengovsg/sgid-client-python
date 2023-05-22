@@ -41,7 +41,7 @@ generate_pkce_pair(length=43)
 
 - Args:
   - `length` (`int`, optional): The length of the code verifier. Defaults to 43.
-- Returns: `dict`
+- Returns: `NamedTuple`
   - `code_verifier`: `str` Randomly generated string
   - `code_challenge`: `str` S256 hash of code verifier
 
@@ -78,7 +78,7 @@ authorization_url(
   - `nonce` (`str | None`, optional): Unique nonce for this request. If this param is
     not provided, a nonce is generated and returned. To prevent this behaviour,
     specify None for this param. Defaults to `secrets.token_urlsafe(32)`.
-- Returns: `dict`
+- Returns: `NamedTuple`
   - `url`: `str` Generated authorization url.
   - `nonce`: `str | None` Provided nonce, randomly generated nonce, or `None` (based on nonce input).
     Should be stored in the user's session so it can be retrieved later for use in `callback`.
@@ -110,7 +110,7 @@ callback(
     Specify None if no nonce was passed to `authorization_url`. Defaults to None.
   - `redirect_uri` (`str | None`, optional): The redirect URI used in the authorization
     request. If not specified, defaults to the one passed to the SgidClient constructor.
-- Returns: `dict`
+- Returns: `NamedTuple`
   - `sub`: `str` Represents a unique identifer for the end-user.
   - `access_token`: `str` Access token used to request user info.
 
@@ -133,7 +133,7 @@ userinfo(sub: str, access_token: str)
 - Args:
   - `sub` (`str`): The sub returned from the callback function
   - `access_token` (`str`): The access token returned from the callback function
-- Returns: `dict`
+- Returns: `NamedTuple`
   - `sub`: `str` Represents a unique identifer for the end-user.
   - `data`: `dict` A dictionary containing end-user info where the keys are the scopes requested in `authorization_url`.
 
