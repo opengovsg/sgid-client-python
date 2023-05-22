@@ -48,15 +48,15 @@ def get_auth_url():
     # so after they log in, we can display it together with the
     # other user info.
     code_verifier, code_challenge = generate_pkce_pair()
-    auth_url_and_nonce = sgid_client.authorization_url(
+    url, nonce = sgid_client.authorization_url(
         state=state, code_challenge=code_challenge
     )
     session_data[session_id] = {
         "state": state,
-        "nonce": auth_url_and_nonce.nonce,
+        "nonce": nonce,
         "code_verifier": code_verifier,
     }
-    res = make_response({"url": auth_url_and_nonce.url})
+    res = make_response({"url": url})
     res.set_cookie(SESSION_COOKIE_NAME, session_id, httponly=True)
     return res
 
