@@ -51,9 +51,12 @@ class SgidClient:
 
             redirect_uri (str | None, optional): Redirection URI for user to return to your
             application after login. If not provided in the constructor, this must
-            be provided to the authorization_url and callback functions.
+            be provided to the authorization_url and callback functions. Defaults to None.
 
             hostname (str, optional): Hostname of OpenID provider (sgID). Defaults to "https://api.id.gov.sg".
+
+        Raises:
+            Exception: if private key is invalid.
         """
         self.client_id = client_id
         self.client_secret = client_secret
@@ -76,19 +79,19 @@ class SgidClient:
             code_challenge (str): The code challenge generated from generate_pkce_pair().
 
             state (str | None, optional): A string which will be passed back to your application once
-            the end-user logs in. You can also use this to track per-request state.
+            the end-user logs in. You can also use this to track per-request state. Defaults to None.
 
             redirect_uri (str | None, optional): The redirect URI used in the authorization
             request. If this param is provided, it will be used instead of the redirect
             URI provided in the SgidClient constructor. If not provided in the constructor,
             the redirect URI must be provided here. Defaults to None.
 
-            scope (str | list[str], optional): 'openid' must be provided as a
+            scope (str | list[str], optional): "openid" must be provided as a
             scope. Defaults to "openid myinfo.name".
 
             nonce (str | None, optional): Unique nonce for this request. If this param is
             not provided, a nonce is generated and returned. To prevent this behaviour,
-            specify None for this param. Defaults to secrets.token_urlsafe(32).
+            specify None for this param. Defaults to `secrets.token_urlsafe(32)`.
 
         Raises:
             Exception: if redirect URI is provided in neither the constructor nor this function.
@@ -183,9 +186,9 @@ class SgidClient:
         """Retrieves verified user info and decrypts it with your private key.
 
         Args:
-            sub (str): The sub returned from the callback function.
+            sub (str): The sub returned from the `callback` function.
 
-            access_token (str): The access token returned from the callback function.
+            access_token (str): The access token returned from the `callback` function.
 
         Raises:
             Exception: if call to userinfo endpoint fails.
