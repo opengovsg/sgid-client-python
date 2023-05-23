@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "sgid-client"
+version = "0.1.0-alpha.0"
+description = "The official Python SDK for sgID"
+authors = ["Open Government Products"]
+readme = "README.md"
+license = "MIT"
+packages = [{include = "sgid_client"}]
+repository = "https://github.com/opengovsg/sgid-client-python"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.30.0"
+jwcrypto = "^1.4.2"
+pycryptodome = "^3.17"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.3.1"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.3.1"
+responses = "^0.23.1"
+jwcrypto = "^1.4.2"
+pycryptodome = "^3.17"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
