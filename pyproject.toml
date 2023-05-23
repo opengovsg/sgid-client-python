@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sgid-client"
-version = "0.1.0"
+version = "0.1.0-alpha.0"
 description = "The official Python SDK for sgID"
 authors = ["Open Government Products"]
 readme = "README.md"
