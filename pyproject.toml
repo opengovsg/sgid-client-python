@@ -4,6 +4,8 @@ version = "0.1.0"
 description = "The official Python SDK for sgID"
 authors = ["Open Government Products"]
 readme = "README.md"
+homepage = "https://id.gov.sg"
+documentation = "https://docs.id.gov.sg"
 license = "MIT"
 packages = [{include = "sgid_client"}]
 repository = "https://github.com/opengovsg/sgid-client-python"
