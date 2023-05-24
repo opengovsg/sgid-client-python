@@ -15,10 +15,10 @@ Use the following details to register:
 1. For "Name", enter any test name (there is no limit to the number of clients you can create)
 2. For "Description", enter any
 3. Under "Scopes", add "NAME"
-4. Under "Callback URLs", add the following:
+4. Under "Redirect URLs", add the following:
 
 ```
-http://localhost:5001/api/callback
+http://localhost:5001/api/redirect
 ```
 
 ### Running the server

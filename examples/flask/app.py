@@ -29,7 +29,7 @@ sgid_client = SgidClient(
     client_id=os.getenv("SGID_CLIENT_ID"),
     client_secret=os.getenv("SGID_CLIENT_SECRET"),
     private_key=os.getenv("SGID_PRIVATE_KEY"),
-    redirect_uri="http://localhost:5001/api/callback",
+    redirect_uri="http://localhost:5001/api/redirect",
 )
 
 
@@ -61,7 +61,7 @@ def get_auth_url():
     return res
 
 
-@app.route("/api/callback")
+@app.route("/api/redirect")
 def callback():
     auth_code = request.args.get("code")
     state = request.args.get("state")

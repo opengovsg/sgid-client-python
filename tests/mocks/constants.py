@@ -43,7 +43,7 @@ MOCK_CONSTANTS = MockConstants(
     client={
         "client_id": "mockClientId",
         "client_secret": "mockClientSecret",
-        "redirect_uri": "https://sgid.com/callback",
+        "redirect_uri": "https://sgid.com/redirect",
         "public_key": mock_client_keys["publicKey"],
         "private_key": mock_client_keys["privateKey"],
         "private_key_pkcs8": mock_private_key_pkcs8.read(),
