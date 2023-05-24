@@ -8,11 +8,11 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 flask = "^2.3.2"
-requests = "^2.30.0"
+requests = "^2.31.0"
 python-dotenv = "^1.0.0"
 jwcrypto = "^1.4.2"
-sgid-client = {git = "https://github.com/opengovsg/sgid-client-python.git", rev = "feat/init-build"}
 flask-cors = "^3.0.10"
+sgid-client = "0.1.0"
 
 
 [build-system]
