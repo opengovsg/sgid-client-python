@@ -4,52 +4,7 @@ The example application code is in `app.py`. You can copy this code to bootstrap
 
 ## Running this example app locally
 
-### Prerequisites
-
-**Register a new sgID client**
-
-Go to the [sgID developer portal](https://developer.id.gov.sg) and [register a new client](https://docs.id.gov.sg/introduction/getting-started/register-your-application).
-
-Use the following details to register:
-
-1. For "Name", enter any test name (there is no limit to the number of clients you can create)
-2. For "Description", enter any
-3. Under "Scopes", add "NAME"
-4. Under "Callback URLs", add the following:
-
-```
-http://localhost:5001/api/callback
-```
-
-### Running the server
-
-1. Clone this repo.
-
-```
-git clone https://github.com/opengovsg/sgid-client-python.git
-```
-
-2. Go to this folder (`examples/flask`) and copy the contents of `.env.example` into a new file called `.env`.
-
-```
-cd sgid-client-python/examples/flask
-cat .env.example > .env
-```
-
-3. Replace the values in `.env` with the credentials of your sgID client (see [Prerequisites](#prerequisites)).
-
-4. Run:
-
-```
-pip install -r requirements.txt
-flask run
-```
-
-This should start the server on port 5001.
-
-### Serving the frontend
-
-sgID provides an [example frontend](https://github.com/opengovsg/sgid-demo-frontend-spa) which you can use to interact with the server in `app.py`. Follow the instructions in that repo to run the example frontend.
+Refer to sgID's [documentation](https://docs.id.gov.sg/integrations-with-sgid/python/framework-guides/flask-with-single-page-app-frontend) for a detailed guide on what this example does and how to run it locally.
 
 ## For contributors
 
