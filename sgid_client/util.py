@@ -22,16 +22,16 @@ def convert_to_pkcs8(private_key: str) -> str:
     except Exception as exc:
         raise Exception(Errors.PRIVATE_KEY_IMPORT) from exc
 
-def is_string_wrapped_in_square_brackets(possible_array_string: str) -> bool:
-    """Checks whether a string starts and ends with square brackets.
+def is_stringified_array_or_object_string(possible_array_or_object_string: str) -> bool:
+    """Checks whether a string starts and ends with square brackets or starts and ends with curly brackets.
 
     Args:
-        possible_array_string (str): A string that might or might not be a stringified array.
+        possible_array_or_object_string (str): A string that might or might not be a stringified array.
 
     Returns:
         bool: either true or false
     """
-    return possible_array_string[0] == '[' and possible_array_string[len(possible_array_string)-1] == ']'
+    return (possible_array_or_object_string[0] == '[' and possible_array_or_object_string[len(possible_array_or_object_string)-1] == ']') or (possible_array_or_object_string[0] == '[' and possible_array_or_object_string[len(possible_array_or_object_string)-1] == ']')
 
 def safe_json_parse(json_string: str) -> dict | list | str:
     """Safely parses a stringified JSON object or array.

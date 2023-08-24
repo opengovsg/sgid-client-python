@@ -8,7 +8,7 @@ from .decrypt_data import decrypt_data
 from .error import Errors, get_network_error_message, get_www_authenticate_error_message
 from .util import (
     convert_to_pkcs8,
-    is_string_wrapped_in_square_brackets,
+    is_stringified_array_or_object_string,
     safe_json_parse
 )
 
@@ -232,6 +232,6 @@ class SgidClient:
             The parsed data value. If the input is a string, then a string is returned. If a
             stringified array or object is passed in, then an array or object is returned respectively.
         """
-        if (is_string_wrapped_in_square_brackets(dataValue)):
+        if (is_stringified_array_or_object_string(dataValue)):
             return safe_json_parse(dataValue)
         return dataValue
