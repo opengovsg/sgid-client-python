@@ -1,9 +1,5 @@
 from jwcrypto import jwk, jwe
 from .error import Errors
-from .util import (
-    is_string_wrapped_in_square_brackets,
-    safe_json_parse
-)
 
 def decrypt_data(encrypted_key: str, encrypted_data: dict, private_key: str):
     try:
@@ -31,12 +27,7 @@ def decrypt_data(encrypted_key: str, encrypted_data: dict, private_key: str):
         for field in encrypted_data:
             # Decrypt encrypted_data[field] to get actual_data
             jwe_data.deserialize(encrypted_data[field], key=block_key)
-
-            decrypted_value = jwe_data.payload.decode("ascii")
-            if (is_string_wrapped_in_square_brackets(decrypted_value)):
-                data_dict[field] = safe_json_parse(decrypted_value)
-            else:
-                data_dict[field] = decrypted_value
+            data_dict[field] = jwe_data.payload.decode("ascii")
     except Exception as exc:
         raise Exception(Errors.USERINFO_DATA_DECRYPT_FAILED) from exc
 
