@@ -1,7 +1,7 @@
 import pytest
 import json
 from sgid_client.util import (
-    is_stringified_array_or_object_string,
+    is_stringified_array_or_object,
     safe_json_parse
 )
 
@@ -14,12 +14,12 @@ exampleString = 'hello world'
 
 class TestIsStringWrappedInSquareBrackets:
     def test_correct_identification_of_input(self):
-        assert is_stringified_array_or_object_string(exampleStringifiedArray) == True
-        assert is_stringified_array_or_object_string(corruptedStringifiedArray) == True
+        assert is_stringified_array_or_object(exampleStringifiedArray) == True
+        assert is_stringified_array_or_object(corruptedStringifiedArray) == True
 
     def test_correct_rejection_of_input(self):
-        assert is_stringified_array_or_object_string(exampleStringifiedObject) == False
-        assert is_stringified_array_or_object_string(exampleString) == False
+        assert is_stringified_array_or_object(exampleStringifiedObject) == False
+        assert is_stringified_array_or_object(exampleString) == False
 
 class TestSafeJsonParse:
     def test_correct_parsing_of_json(self):

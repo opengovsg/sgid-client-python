@@ -22,7 +22,7 @@ def convert_to_pkcs8(private_key: str) -> str:
     except Exception as exc:
         raise Exception(Errors.PRIVATE_KEY_IMPORT) from exc
 
-def is_stringified_array_or_object_string(possible_array_or_object_string: str) -> bool:
+def is_stringified_array_or_object(possible_array_or_object_string: str) -> bool:
     """Checks whether a string starts and ends with square brackets or starts and ends with curly brackets.
 
     Args:
