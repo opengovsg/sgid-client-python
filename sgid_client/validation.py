@@ -22,6 +22,9 @@ def validate_id_token(
     nonce: str | None,
     verifier: IdTokenVerifier.IdTokenVerifier,
 ) -> str:
+    if type(id_token) is not str or id_token == "":
+        raise Exception(Errors.ID_TOKEN_INVALID)
+
     id_token_components = id_token.split(".")
     if len(id_token_components) != 3:
         raise Exception(Errors.ID_TOKEN_MALFORMED)
