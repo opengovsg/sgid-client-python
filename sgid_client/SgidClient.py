@@ -25,6 +25,7 @@ class AuthorizationUrlReturn(NamedTuple):
 
 class CallbackReturn(NamedTuple):
     sub: str
+    id_token: str
     access_token: str
 
 
@@ -67,7 +68,8 @@ class SgidClient:
         self.private_key = convert_to_pkcs8(private_key)
         self.redirect_uri = redirect_uri
         self.issuer = f"{urlparse(hostname).geturl()}/v{API_VERSION}"
-        self.verifier = IdTokenVerifier(jwks_uri=f"{self.issuer}/.well-known/jwks.json")
+        self.verifier = IdTokenVerifier(
+            jwks_uri=f"{self.issuer}/.well-known/jwks.json")
 
     def authorization_url(
         self,
@@ -150,8 +152,9 @@ class SgidClient:
             Exception: if access token validation fails.
 
         Returns:
-            CallbackReturn: The sub (subject identifier claim) of the user and
-            access token. The subject identifier claim is the end-user's unique ID.
+            CallbackReturn: The sub (subject identifier claim) of the user, the ID
+            token, and the access token. The subject identifier claim is the end-user's
+            unique ID.
         """
         url = f"{self.issuer}/oauth/token"
         data = {
@@ -181,7 +184,7 @@ class SgidClient:
             verifier=self.verifier,
         )
         validate_access_token(access_token=access_token)
-        return CallbackReturn(sub=sub, access_token=access_token)
+        return CallbackReturn(sub=sub, id_token=id_token, access_token=access_token)
 
     def userinfo(self, sub: str, access_token: str) -> UserInfoReturn:
         """Retrieves verified user info and decrypts it with your private key.
@@ -220,7 +223,6 @@ class SgidClient:
             private_key=self.private_key,
         )
         return UserInfoReturn(sub=res_body["sub"], data=decrypted_data)
-
 
     def parseData(self, dataValue: str) -> dict | list | str:
         """Parses sgID user data
