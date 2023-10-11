@@ -22,6 +22,7 @@ def convert_to_pkcs8(private_key: str) -> str:
     except Exception as exc:
         raise Exception(Errors.PRIVATE_KEY_IMPORT) from exc
 
+
 def is_stringified_array_or_object(possible_array_or_object_string: str) -> bool:
     """Checks whether a string starts and ends with square brackets or starts and ends with curly brackets.
 
@@ -32,6 +33,7 @@ def is_stringified_array_or_object(possible_array_or_object_string: str) -> bool
         bool: either true or false
     """
     return (possible_array_or_object_string[0] == '[' and possible_array_or_object_string[len(possible_array_or_object_string)-1] == ']') or (possible_array_or_object_string[0] == '[' and possible_array_or_object_string[len(possible_array_or_object_string)-1] == ']')
+
 
 def safe_json_parse(json_string: str) -> dict | list | str:
     """Safely parses a stringified JSON object or array.
@@ -46,3 +48,39 @@ def safe_json_parse(json_string: str) -> dict | list | str:
         return json.loads(json_string)
     except Exception:
         return json_string
+
+
+def is_sgid_userinfo_object(data: object) -> bool:
+    """Checks whether the input is a valid sgID userinfo object by checking:
+    1. Whether the input is a defined dictionary
+    2. That all keys and values in the dictionary are strings
+
+    Args:
+        dataValue (object): an unknown object
+
+    Returns:
+        A boolean that indicates whether the input was a valid sgID userinfo object
+    """
+    if type(data) is not dict:
+        return False
+
+    for key, value in data.items():
+        if type(key) is not str or type(value) is not str:
+            return False
+
+    return True
+
+
+def parse_individual_data_value(dataValue: str) -> dict | list | str:
+    """Parses individual sgID user data values
+
+    Args:
+        dataValue (str): A value from the `data` object returned from the `userinfo` method.
+
+    Returns:
+        The parsed data value. If the input is a string, then a string is returned. If a
+        stringified array or object is passed in, then an array or object is returned respectively.
+    """
+    if (is_stringified_array_or_object(dataValue)):
+        return safe_json_parse(dataValue)
+    return dataValue

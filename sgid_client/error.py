@@ -29,6 +29,7 @@ class SgidClientError(NamedTuple):
     USERINFO_DATA_DECRYPT_FAILED: str
     CODE_VERIFIER_LENGTH_ERROR: str
     PKCE_PAIR_LENGTH_ERROR: str
+    INVALID_SGID_USERINFO_DATA_ERROR: str
 
 
 Errors = SgidClientError(
@@ -56,6 +57,7 @@ Errors = SgidClientError(
     USERINFO_DATA_DECRYPT_FAILED="Decryption of data failed. Check that you passed the correct private key to the SgidClient constructor.",
     CODE_VERIFIER_LENGTH_ERROR="Code verifier should have a minimum length of 43 and a maximum length of 128",
     PKCE_PAIR_LENGTH_ERROR="generate_pkce_pair should receive a minimum length of 43 and a maximum length of 128",
+    INVALID_SGID_USERINFO_DATA_ERROR="Failed to parse sgID userinfo data object. Check that the input is a valid object."
 )
 
 
