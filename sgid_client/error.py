@@ -7,6 +7,7 @@ from requests import Response
 class SgidClientError(NamedTuple):
     MISSING_REDIRECT_URI: str
     TOKEN_ENDPOINT_FAILED: str
+    ID_TOKEN_INVALID: str
     ID_TOKEN_MALFORMED: str
     ID_TOKEN_HEADER_PAYLOAD_MALFORMED: str
     ID_TOKEN_WRONG_SIGNING_ALG: str
@@ -28,11 +29,13 @@ class SgidClientError(NamedTuple):
     USERINFO_DATA_DECRYPT_FAILED: str
     CODE_VERIFIER_LENGTH_ERROR: str
     PKCE_PAIR_LENGTH_ERROR: str
+    INVALID_SGID_USERINFO_DATA_ERROR: str
 
 
 Errors = SgidClientError(
     MISSING_REDIRECT_URI="No redirect URI registered with this client. You must either specify a valid redirect URI in the SgidClient constructor, or pass it to the authorization_url and callback functions.",
     TOKEN_ENDPOINT_FAILED="sgID responded with an error at the token endpoint",
+    ID_TOKEN_INVALID="sgID token endpoint did not return a valid ID token. Expected a non-empty string.",
     ID_TOKEN_MALFORMED="sgID server returned a malformed ID token which did not contain the expected components (header, payload, signature)",
     ID_TOKEN_HEADER_PAYLOAD_MALFORMED="ID token header or payload was malformed",
     ID_TOKEN_WRONG_SIGNING_ALG="Unexpected signing algorithm used for ID token",
@@ -54,6 +57,7 @@ Errors = SgidClientError(
     USERINFO_DATA_DECRYPT_FAILED="Decryption of data failed. Check that you passed the correct private key to the SgidClient constructor.",
     CODE_VERIFIER_LENGTH_ERROR="Code verifier should have a minimum length of 43 and a maximum length of 128",
     PKCE_PAIR_LENGTH_ERROR="generate_pkce_pair should receive a minimum length of 43 and a maximum length of 128",
+    INVALID_SGID_USERINFO_DATA_ERROR="Failed to parse sgID userinfo data object. Check that the input is a valid object."
 )
 
 

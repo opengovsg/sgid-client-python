@@ -8,8 +8,8 @@ from .decrypt_data import decrypt_data
 from .error import Errors, get_network_error_message, get_www_authenticate_error_message
 from .util import (
     convert_to_pkcs8,
-    is_stringified_array_or_object,
-    safe_json_parse
+    is_sgid_userinfo_object,
+    parse_individual_data_value
 )
 
 API_VERSION = 2
@@ -25,6 +25,7 @@ class AuthorizationUrlReturn(NamedTuple):
 
 class CallbackReturn(NamedTuple):
     sub: str
+    id_token: str
     access_token: str
 
 
@@ -67,7 +68,8 @@ class SgidClient:
         self.private_key = convert_to_pkcs8(private_key)
         self.redirect_uri = redirect_uri
         self.issuer = f"{urlparse(hostname).geturl()}/v{API_VERSION}"
-        self.verifier = IdTokenVerifier(jwks_uri=f"{self.issuer}/.well-known/jwks.json")
+        self.verifier = IdTokenVerifier(
+            jwks_uri=f"{self.issuer}/.well-known/jwks.json")
 
     def authorization_url(
         self,
@@ -150,8 +152,9 @@ class SgidClient:
             Exception: if access token validation fails.
 
         Returns:
-            CallbackReturn: The sub (subject identifier claim) of the user and
-            access token. The subject identifier claim is the end-user's unique ID.
+            CallbackReturn: The sub (subject identifier claim) of the user, the ID
+            token, and the access token. The subject identifier claim is the end-user's
+            unique ID.
         """
         url = f"{self.issuer}/oauth/token"
         data = {
@@ -181,7 +184,7 @@ class SgidClient:
             verifier=self.verifier,
         )
         validate_access_token(access_token=access_token)
-        return CallbackReturn(sub=sub, access_token=access_token)
+        return CallbackReturn(sub=sub, id_token=id_token, access_token=access_token)
 
     def userinfo(self, sub: str, access_token: str) -> UserInfoReturn:
         """Retrieves verified user info and decrypts it with your private key.
@@ -221,17 +224,21 @@ class SgidClient:
         )
         return UserInfoReturn(sub=res_body["sub"], data=decrypted_data)
 
-
-    def parseData(self, dataValue: str) -> dict | list | str:
+    def parseData(self, data: object) -> dict[str, dict | list | str]:
         """Parses sgID user data
 
         Args:
-            dataValue (str): A value from the `data` object returned from the `userinfo` method.
+            data (str): a `data` object returned from the `userinfo` method.
 
         Returns:
             The parsed data value. If the input is a string, then a string is returned. If a
             stringified array or object is passed in, then an array or object is returned respectively.
         """
-        if (is_stringified_array_or_object(dataValue)):
-            return safe_json_parse(dataValue)
-        return dataValue
+        if not is_sgid_userinfo_object(data):
+            raise Exception(Errors.INVALID_SGID_USERINFO_DATA_ERROR)
+
+        result = {}
+        for key, value in data.items():
+            result[key] = parse_individual_data_value(value)
+
+        return result

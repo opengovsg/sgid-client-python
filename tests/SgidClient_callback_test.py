@@ -18,22 +18,24 @@ class TestCallback:
     def test_success_no_nonce(self):
         # Arrange
         client = get_client()
+        mock_id_token = create_id_token()
         responses.add(get_jwks_response())
         responses.post(
             url=MOCK_CONSTANTS.server["token_endpoint"],
             json={
-                "id_token": create_id_token(),
+                "id_token": mock_id_token,
                 "access_token": MOCK_CONSTANTS.data["access_token"],
             },
         )
 
         # Act
-        sub, access_token = client.callback(
+        sub, id_token, access_token = client.callback(
             code=MOCK_CONSTANTS.data["auth_code"],
             code_verifier=MOCK_CONSTANTS.data["code_verifier"],
         )
 
         # Assert
+        assert id_token == mock_id_token
         assert sub == MOCK_CONSTANTS.data["sub"]
         assert access_token == MOCK_CONSTANTS.data["access_token"]
 
@@ -42,23 +44,25 @@ class TestCallback:
         # Arrange
         client = get_client()
         nonce = "mockNonce"
+        mock_id_token = create_id_token(nonce=nonce)
         responses.add(get_jwks_response())
         responses.post(
             url=MOCK_CONSTANTS.server["token_endpoint"],
             json={
-                "id_token": create_id_token(nonce=nonce),
+                "id_token": mock_id_token,
                 "access_token": MOCK_CONSTANTS.data["access_token"],
             },
         )
 
         # Act
-        sub, access_token = client.callback(
+        sub, id_token, access_token = client.callback(
             code=MOCK_CONSTANTS.data["auth_code"],
             code_verifier=MOCK_CONSTANTS.data["code_verifier"],
             nonce=nonce,
         )
 
         # Assert
+        assert id_token == mock_id_token
         assert sub == MOCK_CONSTANTS.data["sub"]
         assert access_token == MOCK_CONSTANTS.data["access_token"]
 
@@ -66,22 +70,24 @@ class TestCallback:
     def test_success_refetch_jwks(self):
         # Arrange
         client = get_client()
+        mock_id_token = create_id_token()
         # First return a non-working public key from jwks, then a working one
         # SgidClient should refetch the public key when the non-working one fails
         responses.add(
-            get_jwks_response(json=MOCK_CONSTANTS.server["public_jwks_alternate"])
+            get_jwks_response(
+                json=MOCK_CONSTANTS.server["public_jwks_alternate"])
         )
         responses.add(get_jwks_response())
         responses.post(
             url=MOCK_CONSTANTS.server["token_endpoint"],
             json={
-                "id_token": create_id_token(),
+                "id_token": mock_id_token,
                 "access_token": MOCK_CONSTANTS.data["access_token"],
             },
         )
 
         # Act
-        sub, access_token = client.callback(
+        sub, id_token, access_token = client.callback(
             code=MOCK_CONSTANTS.data["auth_code"],
             code_verifier=MOCK_CONSTANTS.data["code_verifier"],
         )
@@ -93,6 +99,7 @@ class TestCallback:
         assert responses.calls[1].request.url == MOCK_CONSTANTS.server["jwks_endpoint"]
         # call to get updated jwks
         assert responses.calls[2].request.url == MOCK_CONSTANTS.server["jwks_endpoint"]
+        assert id_token == mock_id_token
         assert sub == MOCK_CONSTANTS.data["sub"]
         assert access_token == MOCK_CONSTANTS.data["access_token"]
 
@@ -114,6 +121,54 @@ class TestCallback:
             match=f"sgID responded with an error at the token endpoint\nResponse status: 400\nResponse body: {json.dumps(response_json)}",
         ):
             sub, access_token = client.callback(
+                code=MOCK_CONSTANTS.data["auth_code"],
+                code_verifier=MOCK_CONSTANTS.data["code_verifier"],
+            )
+
+    @responses.activate
+    def test_invalid_id_token_number(self):
+        # Arrange
+        client = get_client()
+        responses.add(get_jwks_response())
+        responses.post(
+            url=MOCK_CONSTANTS.server["token_endpoint"],
+            json={
+                "id_token": 1,
+                "access_token": MOCK_CONSTANTS.data["access_token"],
+            },
+        )
+
+        # Act + Assert
+        with pytest.raises(
+            Exception,
+            match=re.escape(
+                "sgID token endpoint did not return a valid ID token. Expected a non-empty string."),
+        ):
+            sub, id_token, access_token = client.callback(
+                code=MOCK_CONSTANTS.data["auth_code"],
+                code_verifier=MOCK_CONSTANTS.data["code_verifier"],
+            )
+
+    @responses.activate
+    def test_invalid_id_token_empty(self):
+        # Arrange
+        client = get_client()
+        responses.add(get_jwks_response())
+        responses.post(
+            url=MOCK_CONSTANTS.server["token_endpoint"],
+            json={
+                "id_token": "",
+                "access_token": MOCK_CONSTANTS.data["access_token"],
+            },
+        )
+
+        # Act + Assert
+        with pytest.raises(
+            Exception,
+            match=re.escape(
+                "sgID token endpoint did not return a valid ID token. Expected a non-empty string."),
+        ):
+            sub, id_token, access_token = client.callback(
                 code=MOCK_CONSTANTS.data["auth_code"],
                 code_verifier=MOCK_CONSTANTS.data["code_verifier"],
             )
