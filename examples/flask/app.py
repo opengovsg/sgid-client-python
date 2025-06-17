@@ -57,7 +57,7 @@ def get_auth_url():
         "code_verifier": code_verifier,
     }
     res = make_response({"url": url})
-    res.set_cookie(SESSION_COOKIE_NAME, session_id, httponly=True)
+    res.set_cookie(SESSION_COOKIE_NAME, session_id, httponly=True, secure=True, samesite='Lax')
     return res
 
 
