@@ -3,6 +3,8 @@ on:
   push:
   pull_request:
     types: [opened, reopened]
+permissions:
+  contents: read
 jobs:
   ci:
     name: CI
