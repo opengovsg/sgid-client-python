@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-flask = "^2.3.2"
+flask = ">=2.3.2,<4.0.0"
 requests = "^2.31.0"
 python-dotenv = "^1.0.0"
 jwcrypto = "^1.4.2"
